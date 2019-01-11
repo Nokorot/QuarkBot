@@ -1,8 +1,10 @@
 const login = require("facebook-chat-api");
-const fs = require("fs");
 const express = require('express')
 const path = require('path')
+const fs = require("fs");
+const mathjax = require('./mathjax')
 const PORT = process.env.PORT || 5000
+
 
 var log = require("npmlog");
 
@@ -10,16 +12,18 @@ const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 login({appState: JSON.parse(details)}, (err, api) => {
 	web_interface()
 
-
 	console.log("Starting to listen for messages");
-	log.pause();
+	//log.pause();
 	api.listen((err, message) => {
 		//console.log(message.body);
 		//console.log(message.threadID);
-		api.sendMessage({
-			body: message.body,
-			attachment: fs.createReadStream("I_love_maths.png")
-		}, message.threadID);
+
+		mathjax.tex2png(message.body, (path) => {
+			api.sendMessage({
+				// body: message.body,
+				attachment: fs.createReadStream("out.png")
+			}, message.threadID);
+		});
 	});
 });
 

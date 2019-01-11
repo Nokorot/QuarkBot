@@ -12,11 +12,13 @@
   "dependencies": {
     "express": "^4.16.4",
     "facebook-chat-api": "^1.6.1",
-    "fs": "0.0.1-security"
+    "fs": "0.0.1-security",
+    "mathjax-node": "^2.1.1",
+    "mathjax-node-svg2png": "^2.0.0",
   },
   "devDependencies": {
     "request": "^2.81.0",
-    "tape": "^4.7.0"
+    "tape": "^4.9.2"
   },
   "license": "MIT"
 }
