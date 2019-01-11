@@ -17,14 +17,16 @@ login({appState: JSON.parse(details)}, (err, api) => {
 	api.listen((err, message) => {
 		//console.log(message.body);
 		//console.log(message.threadID);
-		if (message.body.trim().startsWith('\\latex'))
+		if (message.body.trim().startsWith('\\latex')){
+			mathjax.tex2png(message.body.replace('\\latex', ''), (path) => {
+				api.sendMessage({
+					// body: message.body,
+					attachment: fs.createReadStream("out.png")
+				}, message.threadID);
+			});
+		}
 
-		mathjax.tex2png(message.body, (path) => {
-			api.sendMessage({
-				// body: message.body,
-				attachment: fs.createReadStream("out.png")
-			}, message.threadID);
-		});
+
 	});
 });
 
