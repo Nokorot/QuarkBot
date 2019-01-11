@@ -4,34 +4,63 @@ const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
 
-const details = fs.readFileSync('appstate.json', 'utf8');
+var log = require("npmlog");
+
+const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 login({appState: JSON.parse(details)}, (err, api) => {
-	express()
-	  .use(express.static(path.join(__dirname, 'public')))
-	  .set('views', path.join(__dirname, 'views'))
-	  .set('view engine', 'ejs')
-	  .get('/', (req, res) => res.send('pages/index'))
-	  .get('/send', (req, res) => {
-	  		res.send(sendMessage(api, "tor-haakon", "Hey it works!"));
-	  	})	 
-	  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+	web_interface()
+
+
+	console.log("Starting to listen for messages");
+	log.pause();
+	api.listen((err, message) => {
+		//console.log(message.body);
+		//console.log(message.threadID);
+		api.sendMessage({
+			body: message.body,
+			attachment: fs.createReadStream("I_love_maths.png")
+		}, message.threadID);
+	});
 });
 
+function web_interface(api) {
+	express()
+		.use(express.static(path.join(__dirname, 'public')))
+		.set('views', path.join(__dirname, 'views'))
+		.set('view engine', 'ejs')
+		.get('/', (req, res) => res.send('pages/index'))
+		.listen(PORT, () => console.log(`Listening on ${ PORT }`))
+}
+
+function sendAttachment(self, userID, filepath){
+		send = (user) => {
+        msg = { attachment: fs.createReadStream(lst[2]) };
+        api.sendMessage(msg, user, (err, resp) => {
+            callback(err);
+        });
+    }
+    if(typeof(userID) === "number"){
+        send(userID)
+    }else if (typeof(userID) === "string") {
+        api.getUserID(userID, (err, users) =>
+            send(users[0].userID)
+        );
+    }
+    break;
+}
+
 function sendMessage(api, user, message) {
-	console.log("Request message sendt!")
-    if(typeof(user) === "number"){
-		console.log("AAA")
-        api.sendMessage(message, user);
+		if(typeof(user) === "number"){
+		    api.sendMessage(message, user);
         return "Sendt";
     }else if (typeof(user) === "string") {
-		console.log("BBB")
-        api.getUserID(user, (err, users) => {
-            api.sendMessage(message, users[0].userID);            
-			console.log("DDD")
-        });
-		console.log("CCC")
-        return "Sendt";
+		    api.getUserID(user, (err, users) => {
+            api.sendMessage(message, users[0].userID);
+		    });
+		    return "Sendt";
     }
-    console.log("EEE")
     return "not sendt"
 }
+
+// fblatexbot@yandex.com
+// Cos_micNøt33
