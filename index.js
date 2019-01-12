@@ -71,8 +71,8 @@ const request = require('request');
 function CeepAlive() {
 	console.log('Hey')
 
-	
-	request('http://127.0.0.1:5000/', { json: true }, (err, res, body) => {
+
+	request('https://fb-latex-bot.herokuapp.com/', { json: true }, (err, res, body) => {
 		if (err) { return console.log(err); }
 		console.log(body);
 	});
