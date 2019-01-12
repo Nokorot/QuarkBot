@@ -5,7 +5,6 @@ const fs = require("fs");
 const mathjax = require('./mathjax')
 const PORT = process.env.PORT || 5000
 
-
 var log = require("npmlog");
 
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
@@ -25,8 +24,6 @@ login({appState: JSON.parse(details)}, (err, api) => {
 				}, message.threadID);
 			});
 		}
-
-
 	});
 });
 
@@ -68,6 +65,21 @@ function sendMessage(api, user, message) {
     }
     return "not sendt"
 }
+
+const request = require('request');
+
+function CeepAlive() {
+	console.log('Hey')
+
+	
+	request('http://127.0.0.1:5000/', { json: true }, (err, res, body) => {
+		if (err) { return console.log(err); }
+		console.log(body);
+	});
+
+	setTimeout(CeepAlive, 60*1000); // 10 minutes
+}
+setTimeout(CeepAlive, 60*1000);
 
 // fblatexbot@yandex.com
 // Cos_micNøt33
