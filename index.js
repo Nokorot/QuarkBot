@@ -5,25 +5,26 @@ const fs = require("fs");
 const mathjax = require('./mathjax')
 const PORT = process.env.PORT || 5000
 
-var log = require("npmlog");
-
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
-login({appState: JSON.parse(details)}, (err, api) => {
-	web_interface()
+function main() {
+	login({appState: JSON.parse(details)}, (err, api) => {
+		web_interface()
 
-	console.log("Starting to listen for messages");
-	//log.pause();
-	api.listen((err, message) => {
-		if (message.body.trim().startsWith('\\latex')){
-			mathjax.tex2png(message.body.replace('\\latex', ''), (path) => {
-				api.sendMessage({
-					// body: message.body,
-					attachment: fs.createReadStream("out.png")
-				}, message.threadID);
-			});
-		}
+		console.log("Starting to listen for messages");
+		//log.pause();
+		api.listen((err, message) => {
+			if (message.body.trim().startsWith('\\latex')){
+				mathjax.tex2png(message.body.replace('\\latex', ''), (path) => {
+					api.sendMessage({
+						// body: message.body,
+						attachment: fs.createReadStream("out.png")
+					}, message.threadID);
+				});
+			}
+		});
 	});
-});
+	setTimeout(CeepAlive, 60*1000);
+}
 
 function web_interface(api) {
 	express()
@@ -65,7 +66,6 @@ function sendMessage(api, user, message) {
 }
 
 const request = require('request');
-
 function CeepAlive() {
 	console.log('Hey')
 
@@ -77,7 +77,11 @@ function CeepAlive() {
 
 	setTimeout(CeepAlive, 60*1000); // 10 minutes
 }
-setTimeout(CeepAlive, 60*1000);
+
+
+if (process.env.PAUSE != 'True') {
+	main();	
+}
 
 // fblatexbot@yandex.com
 // Cos_micNøt33
