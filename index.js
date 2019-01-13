@@ -7,12 +7,13 @@ const PORT = process.env.PORT || 5000
 
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
+	web_interface()
 	login({appState: JSON.parse(details)}, (err, api) => {
-		web_interface()
-
 		console.log("Starting to listen for messages");
 		//log.pause();
 		api.listen((err, message) => {
+			if (process.env.PAUSE == 'True')
+				return;
 			if (message.body.trim().startsWith('\\latex')){
 				mathjax.tex2png(message.body.replace('\\latex', ''), (path) => {
 					api.sendMessage({
@@ -67,17 +68,12 @@ function sendMessage(api, user, message) {
 
 const request = require('request');
 function CeepAlive() {
-	console.log('Hey')
-
-
 	request('https://fb-latex-bot.herokuapp.com/', { json: true }, (err, res, body) => {
 		if (err) { return console.log(err); }
 		console.log(body);
 	});
-
 	setTimeout(CeepAlive, 60*1000); // 10 minutes
 }
-
 
 if (process.env.PAUSE != 'True') {
 	main();	
