@@ -5,26 +5,34 @@ const fs = require("fs");
 const mathjax = require('./mathjax')
 const PORT = process.env.PORT || 5000
 
+const pause = {};
+
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
 	web_interface()
 	login({appState: JSON.parse(details)}, (err, api) => {
 		console.log("Starting to listen for messages");
-		//log.pause();
-		api.listen((err, message) => {
-			if (process.env.PAUSE == 'True')
-				return;
-			if (message.body.trim().startsWith('\\latex')){
-				mathjax.tex2png(message.body.replace('\\latex', ''), (path) => {
-					api.sendMessage({
-						// body: message.body,
-						attachment: fs.createReadStream("out.png")
-					}, message.threadID);
-				});
-			}
-		});
+		api.listen((err, message) => onMassage(api, message));
 	});
 	setTimeout(CeepAlive, 60*1000);
+}
+
+function onMassage(api, message) {
+	if (message.body.trim().startsWith('\\latex')){
+		var msg = message.body.replace('\\latex', '');
+		if (msg.trim().toLowerCase() == 'pause')
+			pause[message.threadID] = true;
+		else if (msg.trim().toLowerCase() == 'unpause')
+			pause[message.threadID] = false;
+		else if (!pause[message.threadID]) {
+			mathjax.tex2png(msg, (path) => {
+				api.sendMessage({
+					// body: message.body,
+					attachment: fs.createReadStream("out.png")
+				}, message.threadID);
+			});
+		}
+	}
 }
 
 function web_interface(api) {
@@ -76,7 +84,7 @@ function CeepAlive() {
 }
 
 if (process.env.PAUSE != 'True') {
-	main();	
+	main();
 }
 
 // fblatexbot@yandex.com
