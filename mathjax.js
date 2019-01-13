@@ -20,13 +20,13 @@ function addBackground(imgpath, callback) {
 
                     var corner = false;
 
-                    if (y < r && x < r && x+y < r){
+                    if (y < r && x < r && x+y < r && (x-r)**2+(y-r)**2 > r**2){
                         corner = true; xx=x, yy=y
-                    } else if (h-1-y < r && x < r){
+                    } else if (h-1-y < r && x < r && (x-r)**2+(h-1-y-r)**2 > r**2){
                         corner = true; xx=x, yy=h-1-y
-                    } else if (y < r && w-1-x < r){
+                    } else if (y < r && w-1-x < r && (w-1-x-r)**2+(y-r)**2 > r**2){
                         corner = true; xx=w-1-x, yy=y;
-                    } else if (h-1-y < r && w-1-x < r) {
+                    } else if (h-1-y < r && w-1-x < r && (w-1-x-r)**2+(h-1-y-r)**2 > r**2) {
                         corner = true; xx=w-1-x, yy=h-1-y;
                     }
 
@@ -34,8 +34,7 @@ function addBackground(imgpath, callback) {
                         for(var i = 0; i<3; i++){
                             this.data[idx+i] = 255;
                         }
-                        var op = 0;
-                        if ((xx-r)**2+(yy)**2 > r**2) op++;
+                        var op = 1;
                         if ((xx+1-r)**2+(yy-r)**2 > r**2) op++;
                         if ((xx-r)**2+(yy+1-r)**2 > r**2) op++;
                         if ((xx+1-r)**2+(yy+1-r)**2 > r**2) op++;
