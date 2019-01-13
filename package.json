@@ -14,7 +14,8 @@
     "facebook-chat-api": "^1.6.1",
     "fs": "0.0.1-security",
     "mathjax-node": "^2.1.1",
-    "mathjax-node-svg2png": "^2.0.0"
+    "mathjax-node-svg2png": "^2.0.0",
+    "pngjs": "^3.3.3"
   },
   "devDependencies": {
     "request": "^2.81.0",

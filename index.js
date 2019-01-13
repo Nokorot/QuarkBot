@@ -14,8 +14,6 @@ login({appState: JSON.parse(details)}, (err, api) => {
 	console.log("Starting to listen for messages");
 	//log.pause();
 	api.listen((err, message) => {
-		//console.log(message.body);
-		//console.log(message.threadID);
 		if (message.body.trim().startsWith('\\latex')){
 			mathjax.tex2png(message.body.replace('\\latex', ''), (path) => {
 				api.sendMessage({
@@ -32,7 +30,7 @@ function web_interface(api) {
 		.use(express.static(path.join(__dirname, 'public')))
 		.set('views', path.join(__dirname, 'views'))
 		.set('view engine', 'ejs')
-		.get('/', (req, res) => res.send('pages/index'))
+		.get('/', (req, res) => res.send('Pages is currently under construction'))
 		.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 }
 

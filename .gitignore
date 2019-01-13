@@ -7,12 +7,8 @@ npm-debug.log
 *.dev
 .DS_Store
 
-
-# files 
-test.js
-latex2png.js
-quicklatex.js
-quicklatex_stuf.js
+# files/folders
+test
 
 # Docker
 Dockerfile
