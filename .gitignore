@@ -9,6 +9,7 @@ npm-debug.log
 
 # files/folders
 test
+Test.txt
 
 # Docker
 Dockerfile

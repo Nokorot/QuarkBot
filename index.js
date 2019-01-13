@@ -20,10 +20,14 @@ function main() {
 function onMassage(api, message) {
 	if (message.body.trim().startsWith('\\latex')){
 		var msg = message.body.replace('\\latex', '');
-		if (msg.trim().toLowerCase() == 'pause')
+		if (msg.trim().toLowerCase() == 'pause') {
 			pause[message.threadID] = true;
-		else if (msg.trim().toLowerCase() == 'unpause')
+			api.sendMessage("Latex comelation is PAUSED!")
+		}
+		else if (msg.trim().toLowerCase() == 'unpause') {
 			pause[message.threadID] = false;
+			api.sendMessage("Latex comelation is ENABLED!")
+		}
 		else if (!pause[message.threadID]) {
 			mathjax.tex2png(msg, (path) => {
 				api.sendMessage({
