@@ -38,7 +38,7 @@ function addBackground(imgpath, callback) {
                         if ((xx+1-r)**2+(yy-r)**2 > r**2) op++;
                         if ((xx-r)**2+(yy+1-r)**2 > r**2) op++;
                         if ((xx+1-r)**2+(yy+1-r)**2 > r**2) op++;
-                        
+
                         this.data[idx+3] = (4-op)*255/4;
                     } else {
                         for(var i = 0; i<3; i++){
@@ -62,7 +62,6 @@ function addBackground(imgpath, callback) {
 
 (function() {
   module.exports.tex2png = function(yourMath, callback) {
-    console.log(yourMath);
     mjAPI.typeset({
       math: yourMath,
       format: "TeX", // or "inline-TeX", "MathML"

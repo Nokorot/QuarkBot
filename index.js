@@ -18,29 +18,36 @@ function main() {
 }
 
 function onMassage(api, message) {
+	console.log(message);
 	var key = '\\latex'
 
 	var msg = message.body;
 	if (msg.trim().startsWith(key)){
-		var msg = message.body.replace(key, '');
-		if (msg.trim().toLowerCase() == 'pause') {
+		var code = message.body.replace(key, '');
+		if (code.trim().toLowerCase() == 'pause') {
 			pause[message.threadID] = true;
+			console.log("Latex comelation is PAUSED!");
 			api.sendMessage("Latex comelation is PAUSED!");
 		}
-    else if (msg.trim().toLowerCase() == 'unpause') {
+    else if (code.trim().toLowerCase() == 'unpause') {
 			pause[message.threadID] = false;
+			console.log("Latex comelation is ENABLED!");
 			api.sendMessage("Latex comelation is ENABLED!");
 		}
-	} else if (msg.includes(key)) {
+	}
+	if (msg.includes(key)) {
 		var body = msg.substring(0, msg.indexOf(key));
     var code = msg.substring(msg.indexOf(key)+key.length, msg.length);
-		mathjax.tex2png(code, (path) => {
- 				api.sendMessage({
- 					body: body,
- 					attachment: fs.createReadStream("out.png")
- 				}, message.threadID);
- 		});
-	 }
+		if (!pause[message.threadID]) {
+			console.log(code);
+			mathjax.tex2png(code, (path) => {
+	 				api.sendMessage({
+	 					body: body,
+	 					attachment: fs.createReadStream("out.png")
+	 				}, message.threadID);
+	 		});
+		}
+	}
 }
 
 function web_interface(api) {
