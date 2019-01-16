@@ -10,15 +10,34 @@ const pause = {};
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
 	web_interface()
+
 	login({appState: JSON.parse(details)}, (err, api) => {
+		setInterval(() => {handleMessageRequests(api)}, 2*1000); // Every .5 minute
+
+		api.setOptions({listenEvents: true})
 		console.log("Starting to listen for messages");
-		api.listen((err, message) => onMassage(api, message));
+		api.listen((err, event) => {
+			if (err) return;
+			console.log(event);
+			if (event['type'] == 'message' && event.senderID == '100002011303211')
+				onMassage(api, event);
+		});
 	});
-	setTimeout(CeepAlive, 60*1000);
+	setInterval(CeepAlive, 600*1000);  // Every 10 minutes
+}
+
+function handleMessageRequests(api) {
+	api.getThreadList(100, null, ['PENDING'], (err, list) => {
+		list.forEach((req)=>{
+			console.log(req.threadID);
+			api.handleMessageRequest(req.threadID, true);
+			api.markAsRead(req.threadID, true);
+		});
+	});
 }
 
 function onMassage(api, message) {
-	console.log(message);
+	console.log(message.body);
 	var key = '\\latex'
 
 	var msg = message.body;
@@ -95,7 +114,6 @@ function CeepAlive() {
 		if (err) { return console.log(err); }
 		console.log(body);
 	});
-	setTimeout(CeepAlive, 60*1000); // 10 minutes
 }
 
 if (process.env.PAUSE != 'True') {
