@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000
 
 const pause = {};
 
-const DEBUG = true;
+var DEBUG = true;
 process.argv.forEach((arg) => {
 	if (arg == 'debugOff')
 		DEBUG = false;
