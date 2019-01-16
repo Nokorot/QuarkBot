@@ -7,8 +7,16 @@ const PORT = process.env.PORT || 5000
 
 const pause = {};
 
+const DEBUG = true;
+process.argv.forEach((arg) => {
+	if (arg == 'debugOff')
+		DEBUG = false;
+});
+
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
+
+
 	web_interface()
 
 	login({appState: JSON.parse(details)}, (err, api) => {
@@ -19,7 +27,7 @@ function main() {
 		api.listen((err, event) => {
 			if (err) return;
 			console.log(event);
-			if (event['type'] == 'message' && event.senderID == '100002011303211')
+			if (event['type'] == 'message' && !DEBUG || event.senderID == '100002011303211')
 				onMassage(api, event);
 		});
 	});
@@ -117,6 +125,7 @@ function CeepAlive() {
 }
 
 if (process.env.PAUSE != 'True') {
+
 	main();
 }
 
