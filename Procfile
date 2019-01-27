@@ -1,1 +1,1 @@
-web: node index.js debugOff
+web: node index.js

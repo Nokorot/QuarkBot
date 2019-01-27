@@ -66,7 +66,7 @@ function addBackground(imgpath, callback) {
       math: yourMath,
       format: "TeX", // or "inline-TeX", "MathML"
       png:true,      // or svg:true, or html:true
-      scale:10
+      scale:5
     }, function (data) {
         var base64Data = data.png.replace(/^data:image\/png;base64,/, "");
         fs.writeFile("out.png", base64Data, 'base64', function(err) {

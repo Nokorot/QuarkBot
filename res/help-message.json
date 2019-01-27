@@ -1,0 +1,8 @@
+{"main": "Command list:\n \\help to show this message \n \\pause: temporarily pause the bot.\n \\unpause: to enable the bot if paused. \n \\define: define shortcuts. \n \\undefine to delete a shortcut. \n \\getdefines to list the defined shortcuts. \n\n Use \"\\help \\<command>\" for more info.",
+  "latex": ["You can now add LaTeX code on your messages! Just type \\latex before the code you would like to send and I will take care of the rest. For example, if you write \"Euler's identity \\latex e^{i\\pi} + 1 = 0\", I will send:",
+    {"body": "Euler's identity",
+     "attachment": "res/eulers.png"}],
+  "define-undefine": "You can define shortcuts for frequently used code for simplicity. Just write \\define shortcut code. If you desire to delete this shortcut, simply write \\undefine shortcut. If you use any of these commands on a group chat that includes me, all members of the chat will have access to the shortcuts and they will only be available within that group. However, if you would like to restrict the shortcuts for yourself, you can use the \\define commands on your private chat with me. Then, you will also be able to use your shortcuts on any chat that I am included in.",
+  "getdefines": "Use \"\\getdefine\", in order to see all defines. If used in a group chat, it will contain all defines bound to that chat. If used in the private chat with me, it will contain all global defines bound to you.",
+  "pause-unpause": "Use \"\\pause\" to temporarily pause me. Use \"\\unpause\" to enable me again."
+}
