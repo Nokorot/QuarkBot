@@ -142,7 +142,8 @@ function handleDefines(message) {
 
 function latex_unicode_compiler(code) {
 	latex_compiler_keys.forEach((key) => {
-		search = code.startsWith('^') || code.startsWith('_') ? key : "\\"+key;
+		search = (key.startsWith('^') || key.startsWith('_')) ? key : "\\"+key;
+		console.log(code, search);
 		code = code.replaceAll(search, latex_compiler_obj[key]);
 	});
 	return code;
