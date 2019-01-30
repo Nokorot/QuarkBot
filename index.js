@@ -5,6 +5,9 @@ const fs = require("fs");
 const mathjax = require('./mathjax')
 const PORT = process.env.PORT || 5000
 
+const latex_compiler_obj = JSON.parse(
+		fs.readFileSync("res/completions.json"));
+
 var log = require("npmlog");
 log.pause();
 
@@ -123,15 +126,29 @@ function handleDefines(message) {
 	if (defs) Object.keys(defs).forEach((key) => {
 		msg = msg.replace(key, defs[key]);
 	});
+
 	return msg;
+}
+
+
+function latex_unicode_compiler(code) {
+	console.log(code);
+
+	Object.keys(latex_compiler_obj).forEach((key) => {
+		code = code.replace("\\"+key, latex_compiler_obj[key]);
+	});
+	console.log(code);
+	return code;
 }
 
 // Handle LaTeX event:
 function latex_message(api, message, code){
 	const msg = handleDefines(message);
-	var body = msg.substring(0, msg.indexOf('\\latex'));
+	var body = latex_unicode_compiler(msg.substring(0, msg.indexOf('\\latex')));
 	var code = msg.substring(msg.indexOf('\\latex')+'\\latex'.length, msg.length);
-	if (!pause[message.threadID]) {
+	if (code.length < 1){
+		api.sendMessage(body, message.threadID);
+	} else if (!pause[message.threadID]) {
 		mathjax.tex2png(code, (path) => {
 				api.sendMessage({
 					body: body,
