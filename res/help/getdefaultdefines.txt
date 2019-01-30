@@ -1,0 +1,1 @@
+Use "\getDefaultDefines", to get a list of all the defines that are always defined. However you may overide them if you wish.

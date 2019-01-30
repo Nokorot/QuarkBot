@@ -1,0 +1,68 @@
+% !TeX spellcheck = en_GB
+\documentclass[a4paper,10pt,english]{article}
+\usepackage[utf8]{inputenc}
+
+% Standard stuff
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{varioref}
+\usepackage{geometry}
+
+% Packagers
+%\usepackage{tikz,wrapfig}
+%\usetikzlibrary{arrows, shapes}
+%\usepackage{pstricks-add}
+
+% Page alignment.
+\usepackage{titling}
+\setlength{\droptitle}{-4em}
+\addtolength{\hoffset}{-0.5in}
+\addtolength{\textwidth}{0.75in}
+
+\addtolength{\voffset}{-.5in}
+\addtolength{\textheight}{1.75in}
+
+% Maths pakages
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+
+% Standard setts.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+
+% Maths envirements
+\newtheorem{prop}{Proposition}
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{corollary}{Corollary}[theorem]
+%\newtheorem{lemma}[theorem]{Lemma}
+
+% Vector calculus.
+\newcommand{\dif}[3][]{% \deriv[<order>]{<func>}{<var>}
+	\ensuremath{\frac{d^{#1} {#2}}{d {#3}^{#1}}}}
+\newcommand{\pdif}[3][]{% \deriv[<order>]{<func>}{<var>}
+	\ensuremath{\frac{\partial^{#1} {#2}}{\partial {#3}^{#1}}}}
+
+%\renewcommand*{\vec}[1]{\underline{#1}}
+\renewcommand*{\vec}[1]{\mathbf{#1}}
+\newcommand{\pmat}[1]{\begin{pmatrix} #1 \end{pmatrix}}
+\newcommand{\cvecTwo}[2]{\begin{pmatrix} #1 \\ #2 \end{pmatrix}}
+\newcommand{\rvecTwo}[2]{\begin{pmatrix} #1 & #2 \end{pmatrix}}
+
+% Short hands.
+\renewcommand{\bar}[1]{\overline{#1}}
+\newcommand{\qqquad}{\qquad\qquad}
+\newcommand{\qq}[1]{\quad#1\quad}
+\newcommand{\q}[1]{\:\:#1\:\:}
+\newcommand{\st}{\:\text{s.t.}\:}
+\newcommand{\lst}{\qq{|}}
+
+\renewcommand{\mod}[1]{\quad(\text{mod } #1)}
+
+\newcommand{\If}{\ensuremath{\Longleftarrow}}
+\newcommand{\Imp}{\ensuremath{\Longrightarrow}}
+\newcommand{\Iff}{\ensuremath{\Longleftrightarrow}}
+
+\input{Body}
+

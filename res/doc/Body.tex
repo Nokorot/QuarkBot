@@ -1,0 +1,50 @@
+% !TeX spellcheck = en_US
+
+\usepackage{listings}
+
+%opening
+\title{Quark Bot basic documentation}
+\author{Tor-Haakon Gjone}
+
+\begin{document}
+\maketitle
+
+
+Command list:
+\\help to show this message
+\\pause: temporarily pause the bot.
+\\unpause: to enable the bot if paused.
+\\define: define shortcuts.
+\\undefine to delete a shortcut.
+\\getdefines to list the defined shortcuts.
+
+Use "\\help \\<command>" for more info.
+
+
+\section{latex}
+You can now add LaTeX code on your messages!
+Just type \\latex before the code you would like to send and I will take care of the rest.
+For example, if you write 
+\begin{lstlisting}
+"Euler's identity \latex e^{i\pi} + 1 = 0"
+\end{lstlisting}
+I will send:
+
+::newmessage Euler's identity
+::attachment(res/eulers.png)
+
+
+\section{define}
+You can define shortcuts for frequently used code for simplicity. Just write \\define shortcut code. If you desire to delete this shortcut, simply write \\undefine shortcut.
+If you use any of these commands on a group chat that includes me, all members of the chat will have access to the shortcuts and they will only be available within that group.
+However, if you would like to restrict the shortcuts for yourself, you can use the \\define commands on your private chat with me.
+Then, you will also be able to use your shortcuts on any chat that I am included in.
+\\subsection*{defaults}
+Use "\\getDefaultDefines", to get a list of all the defines that are always defined. However you may overide them if you wish.
+
+
+\section*{pause}
+Use "\\pause" to temporarily pause me. Use "\\unpause" to enable me again.
+
+
+\end{document}

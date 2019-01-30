@@ -1,0 +1,3 @@
+Use "\getdefine", in order to see all defines.
+If used in a group chat, it will contain all defines bound to that chat.
+If used in the private chat with me, it will contain all global defines bound to you.

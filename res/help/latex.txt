@@ -1,0 +1,5 @@
+You can now add LaTeX code on your messages!
+Just type \latex before the code you would like to send and I will take care of the rest.
+For example, if you write "Euler's identity \latex e^{i\pi} + 1 = 0", I will send:
+::newmessage Euler's identity
+::attachment(res/eulers.png)

@@ -5,8 +5,8 @@ const fs = require("fs");
 const mathjax = require('./mathjax')
 const PORT = process.env.PORT || 5000
 
-const latex_compiler_obj = JSON.parse(
-		fs.readFileSync("res/completions.json"));
+const latex_compiler_obj = JSON.parse(fs.readFileSync("res/completions.json"));
+const latex_compiler_keys = Object.keys(latex_compiler_obj).sort().reverse();
 
 var log = require("npmlog");
 log.pause();
@@ -35,6 +35,15 @@ const pdefines_file = DEBUG
 			: "/personal_defines.json";
 var pdefines_dont_oweride = true;
 var pdefines = {};
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
+String.prototype.regexIndexOf = function(regex, startpos) {
+    var indexOf = this.substring(startpos || 0).search(regex);
+    return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+}
 
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
@@ -94,21 +103,22 @@ function onMassage(api, message) {
 		return;
 
 	var msg = message.body;
-	if (msg.trim().startsWith('\\') ){
+
+	if (msg.includes('\\latex')) {
+		latex_message(api, message);
+	} else if (msg.trim().startsWith('\\') ){
 		var code = message.body.split(' ');
 		var command = {
 			'\\getdefines': getdefines,
+			'\\getlatexchars': getlatexchars,
 			'\\define': newDefine,
 			'\\undefine': undefine,
 			'\\pause': pause_thread,
 			'\\unpause': unpause_thread,
-			'\\latex': latex_message,
 			'\\help': help
-		}[code[0]];
+		}[code[0].toLowerCase()];
 		if (command) command(api, message, code.slice(1));
 		else api.sendMessage('Unknown command "' + code[0].toLowerCase() + '", try "\\help" for help', message.threadID);
-	} else if (msg.includes('\\latex')) {
-		latex_message(api, message);
 	}
 
 	// handleNewChat()
@@ -130,14 +140,11 @@ function handleDefines(message) {
 	return msg;
 }
 
-
 function latex_unicode_compiler(code) {
-	console.log(code);
-
-	Object.keys(latex_compiler_obj).forEach((key) => {
-		code = code.replace("\\"+key, latex_compiler_obj[key]);
+	latex_compiler_keys.forEach((key) => {
+		search = code.startsWith('^') || code.startsWith('_') ? key : "\\"+key;
+		code = code.replaceAll(search, latex_compiler_obj[key]);
 	});
-	console.log(code);
 	return code;
 }
 
@@ -159,6 +166,15 @@ function latex_message(api, message, code){
 }
 
 // handle commands:
+function getlatexchars(api, message, code) {
+	console.log();
+	api.sendMessage({
+		attachment: fs.createReadStream("res/completions.json")
+	}, message.threadID, (err, res) => {
+		console.log(err);
+	});
+}
+
 function getdefines(api, message, code) {
 	if (message.isGroup) {
 		const defs = defines[message.threadID]
@@ -213,7 +229,38 @@ function undefine(api, message, code){
 }
 
 function help(api, message, code) {
-	var obj = JSON.parse(fs.readFileSync('res/help-message.json', 'utf8'));
+	file = "res/help/" + {
+					undefined: 'main',
+					'latex': "latex",
+					'getdefines': "getdefines",
+					'define': "define-undefine",
+					'undefine': "define-undefine",
+					'pause': "pause-unpause",
+					'unpause': "pause-unpause",
+					'getdefaultdefines': "getdefaultdefines",
+	}[code[0]] + ".txt";
+
+	fs.readFile(file, {encoding: 'utf8'}, (err, res) => {
+		if (!err) {
+			res.split('::newmessage').forEach( (msg) => {
+				var attach = msg.regexIndexOf(new RegExp('::attachment\(.*\)'), 0);
+				if (attach > 0) {
+					attach_file = msg.substring(attach+'::attachment\('.length, msg.indexOf("\)", attach));
+					console.log( attach_file );
+					msg = {
+						'body': msg.replace(new RegExp('::attachment\(.*\)'), ''),
+						'attachment': fs.createReadStream( attach_file )
+					};
+				}
+				api.sendMessage(msg, message.threadID);
+			});
+		} else {
+			console.log(err);
+		}
+	});
+
+	/*
+	var obj = JSON.parse(fs.readFileSync('res/help/help-message.json', 'utf8'));
 
 	var msg;
 	if (!code[0]){
@@ -226,6 +273,7 @@ function help(api, message, code) {
 			'undefine': "define-undefine",
 			'pause': "pause-unpause",
 			'unpause': "pause-unpause",
+			'getdefaultdefines': "getdefaultdefines",
 		}[code[0]]];
 	}
 
@@ -236,8 +284,7 @@ function help(api, message, code) {
 		if (typeof(m) == 'object' && m['attachment'])
 			m['attachment'] = fs.createReadStream(m['attachment']);
 		api.sendMessage(m, message.threadID);
-	});
-
+	});*/
 }
 
 function handleNewChat(threadID) {
@@ -271,6 +318,7 @@ function sendAttachment(self, userID, filepath){
         );
     }
     break;
+
 }
 
 function sendMessage(api, user, message) {
@@ -363,7 +411,6 @@ var k = process.env.PAUSE;
 if (!k || k.toLowerCase() != 'true') {
 	main();
 }
-
 
 
 // fblatexbot@yandex.com

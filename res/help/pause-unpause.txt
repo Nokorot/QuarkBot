@@ -1,0 +1,1 @@
+Use "\pause" to temporarily pause me. Use "\unpause" to enable me again.
