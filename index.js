@@ -154,7 +154,7 @@ function latex_message(api, message, code){
 	const msg = message.body;
 	var body = latex_unicode_compiler(handleDefines( msg.substring(0, msg.indexOf('\\latex')) ));
 	var code = handleDefines( msg.substring(msg.indexOf('\\latex')+'\\latex'.length, msg.length) );
-	if (code.length < 1){
+	if (code && code.length < 1){
 		api.sendMessage(body, message.threadID);
 	} else if (!pause[message.threadID]) {
 		mathjax.tex2png(code, (path) => {
