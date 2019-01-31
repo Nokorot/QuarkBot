@@ -113,6 +113,7 @@ function onMassage(api, message) {
 			'\\getlatexchars': getlatexchars,
 			'\\define': newDefine,
 			'\\undefine': undefine,
+			'\\undefineall': undefineall,
 			'\\pause': pause_thread,
 			'\\unpause': unpause_thread,
 			'\\help': help
@@ -124,8 +125,7 @@ function onMassage(api, message) {
 	// handleNewChat()
 }
 
-function handleDefines(message) {
-	var msg = message.body;
+function handleDefines(message, msg) {
 	if (message.isGroup) {
 		var defs = defines[message.threadID];
 		if (defs) Object.keys(defs).forEach((key) => {
@@ -143,7 +143,6 @@ function handleDefines(message) {
 function latex_unicode_compiler(code) {
 	latex_compiler_keys.forEach((key) => {
 		search = (key.startsWith('^') || key.startsWith('_')) ? key : "\\"+key;
-		console.log(code, search);
 		code = code.replaceAll(search, latex_compiler_obj[key]);
 	});
 	return code;
@@ -151,9 +150,9 @@ function latex_unicode_compiler(code) {
 
 // Handle LaTeX event:
 function latex_message(api, message, code){
-	const msg = handleDefines(message);
-	var body = latex_unicode_compiler(msg.substring(0, msg.indexOf('\\latex')));
-	var code = msg.substring(msg.indexOf('\\latex')+'\\latex'.length, msg.length);
+	const msg;
+	var body = latex_unicode_compiler(handleDefines( message.body.substring(0, message.body.indexOf('\\latex')) ));
+	var code = handleDefines( msg.substring(msg.indexOf('\\latex')+'\\latex'.length, msg.length) );
 	if (code.length < 1){
 		api.sendMessage(body, message.threadID);
 	} else if (!pause[message.threadID]) {
@@ -226,6 +225,16 @@ function undefine(api, message, code){
 	} else {
 		delete pdefines[message.threadID][code[0]];
 		api.sendMessage("global \""+code[0]+"\" is undefined", message.threadID);
+	}
+}
+
+function undefineall(api, message, code){
+	if (message.isGroup) {
+		delete defines[message.threadID];
+		api.sendMessage("All your defenitions are now gone", message.threadID);
+	} else {
+		delete pdefines[message.threadID];
+		api.sendMessage("All your global defenitions are now gone", message.threadID);
 	}
 }
 
