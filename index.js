@@ -141,6 +141,7 @@ function handleDefines(message, msg) {
 }
 
 function latex_unicode_compiler(code) {
+	if (!code) return code;
 	latex_compiler_keys.forEach((key) => {
 		search = (key.startsWith('^') || key.startsWith('_')) ? key : "\\"+key;
 		code = code.replaceAll(search, latex_compiler_obj[key]);
