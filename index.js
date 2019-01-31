@@ -150,8 +150,8 @@ function latex_unicode_compiler(code) {
 
 // Handle LaTeX event:
 function latex_message(api, message, code){
-	const msg;
-	var body = latex_unicode_compiler(handleDefines( message.body.substring(0, message.body.indexOf('\\latex')) ));
+	const msg = message.body;
+	var body = latex_unicode_compiler(handleDefines( msg.substring(0, msg.indexOf('\\latex')) ));
 	var code = handleDefines( msg.substring(msg.indexOf('\\latex')+'\\latex'.length, msg.length) );
 	if (code.length < 1){
 		api.sendMessage(body, message.threadID);
