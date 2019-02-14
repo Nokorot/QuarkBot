@@ -54,7 +54,6 @@ function addBackground(imgpath, callback) {
             this.pack()
                 .pipe(fs.createWriteStream(imgpath))
                 .on('finish', function () {
-                    console.log('Hey');
                     callback();
                 });
         });

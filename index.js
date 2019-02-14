@@ -11,30 +11,13 @@ const latex_compiler_keys = Object.keys(latex_compiler_obj).sort().reverse();
 var log = require("npmlog");
 log.pause();
 
-const dfs = require('dropbox-fs')({
-    apiKey: process.env.DROPBOX_API_KEY
-});
+const dbDataObj = require('./src/dropbox_data_obj')
 
 var DEBUG = process.env.DEBUG;
 
-// TODO: Make a atrib data object
-const pause_file = DEBUG
-			? "/debug/threads/pause.json"
-			: "/threads/pause.json";
-var pause_dont_oweride = true;
-var pause = {};
-
-const defines_file = DEBUG
-			? "/debug/threads/defines.json"
-			: "/threads/defines.json";
-var defines_dont_oweride = true;
-var defines = {};
-
-const pdefines_file = DEBUG
-			? "/debug/personal_defines.json"
-			: "/personal_defines.json";
-var pdefines_dont_oweride = true;
-var pdefines = {};
+let pause = new dbDataObj("threads/pause.json", DEBUG);
+let defines = new dbDataObj("threads/defines.json", DEBUG);
+let pdefines = new dbDataObj("pdefines.json", DEBUG);
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
@@ -47,7 +30,7 @@ String.prototype.regexIndexOf = function(regex, startpos) {
 
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
-	dropbox_get();
+	dropbox_pull();
 	web_interface()
 
 	login({appState: JSON.parse(details)}, (err, api) => {
@@ -72,7 +55,7 @@ function main() {
 			}
 		});
 	});
-	setInterval(dropbox_upload, 30*1000) // Every .5 minute
+	setInterval(dropbox_upload, DEBUG ? 10*1000 : 300*1000) // Every 5 minute
 	setInterval(CeepAlive, 600*1000);  // Every 10 minutes
 }
 
@@ -127,12 +110,12 @@ function onMassage(api, message) {
 
 function handleDefines(message, msg) {
 	if (message.isGroup) {
-		var defs = defines[message.threadID];
+		var defs = defines.data[message.threadID];
 		if (defs) Object.keys(defs).forEach((key) => {
 			msg = msg.replace(key, defs[key]);
 		});
 	}
-	defs = pdefines[message.senderID];
+	defs = pdefines.data[message.senderID];
 	if (defs) Object.keys(defs).forEach((key) => {
 		msg = msg.replace(key, defs[key]);
 	});
@@ -151,24 +134,24 @@ function latex_unicode_compiler(code) {
 
 // Handle LaTeX event:
 function latex_message(api, message, code){
+	if (pause.data[message.threadID]) return;
 	const msg = message.body;
 	var body = latex_unicode_compiler(handleDefines( message, msg.substring(0, msg.indexOf('\\latex')) ));
 	var code = handleDefines( message, msg.substring(msg.indexOf('\\latex')+'\\latex'.length, msg.length) );
-	if (code && code.length < 1){
-		api.sendMessage(body, message.threadID);
-	} else if (!pause[message.threadID]) {
+	if (code && code.length > 1){
 		mathjax.tex2png(code, (path) => {
 				api.sendMessage({
 					body: body,
 					attachment: fs.createReadStream("out.png")
 				}, message.threadID);
 		});
+	} else {
+		api.sendMessage(body, message.threadID);
 	}
 }
 
 // handle commands:
 function getlatexchars(api, message, code) {
-	console.log();
 	api.sendMessage({
 		attachment: fs.createReadStream("res/completions.json")
 	}, message.threadID, (err, res) => {
@@ -178,14 +161,14 @@ function getlatexchars(api, message, code) {
 
 function getdefines(api, message, code) {
 	if (message.isGroup) {
-		const defs = defines[message.threadID]
+		const defs = defines.data[message.threadID]
 		if (defs && Object.entries(defs).length > 0) {
 			var s = Object.entries(defs).map((e)=> e[0] + ": \t" + e[1]).join('\n');
 			api.sendMessage("Local defines:\n" + s, message.threadID);
 		}
 		else api.sendMessage('There are no defines bound to this thread! Use "\\help define" to learn how', message.threadID);
 	} else {
-		const defs = pdefines[message.threadID];
+		const defs = pdefines.data[message.threadID];
 		if (defs && Object.entries(defs).length > 0) {
 			var s = Object.entries(defs).map((e)=> e[0] + ": \t" + e[1]).join('\n');
 			api.sendMessage("Your global defines:\n" + s, message.threadID);
@@ -195,13 +178,13 @@ function getdefines(api, message, code) {
 }
 
 function pause_thread(api, message, code) {
-	pause[message.threadID] = true;
+	pause.data[message.threadID] = true;
 	console.log("Quark Bot is PAUSED!");
 	api.sendMessage("Quark Bot is PAUSED!\nUse \"\\quark unpause\" to enable it aigain.", message.threadID);
 }
 
 function unpause_thread(api, message, code) {
-	pause[message.threadID] = false;
+	pause.data[message.threadID] = false;
 	console.log("Quark Bot is ENABLED!");
 	api.sendMessage("Quark Bot is ENABLED!", message.threadID);
 }
@@ -209,32 +192,32 @@ function unpause_thread(api, message, code) {
 function newDefine(api, message, code){
 	const define_value = code.slice(1).join(' ');
 	if (message.isGroup) {
-		if (!defines[message.threadID]) defines[message.threadID] = {};
-		defines[message.threadID][code[0]] = define_value;
+		if (!defines.data[message.threadID]) defines.data[message.threadID] = {};
+		defines.data[message.threadID][code[0]] = define_value;
 		api.sendMessage("\""+code[0]+"\" is defined", message.threadID);
 	} else {
-		if (!pdefines[message.senderID]) pdefines[message.senderID] = {};
-		pdefines[message.senderID][code[0]] = define_value;
+		if (!pdefines.data[message.senderID]) pdefines.data[message.senderID] = {};
+		pdefines.data[message.senderID][code[0]] = define_value;
 		api.sendMessage("\""+code[0]+"\" is defined globaly", message.senderID);
 	}
 }
 
 function undefine(api, message, code){
 	if (message.isGroup) {
-		delete defines[message.threadID][code[0]];
+		delete defines.data[message.threadID][code[0]];
 		api.sendMessage("\""+code[0]+"\" is undefined", message.threadID);
 	} else {
-		delete pdefines[message.threadID][code[0]];
+		delete pdefines.data[message.threadID][code[0]];
 		api.sendMessage("global \""+code[0]+"\" is undefined", message.threadID);
 	}
 }
 
 function undefineall(api, message, code){
 	if (message.isGroup) {
-		delete defines[message.threadID];
+		delete defines.data[message.threadID];
 		api.sendMessage("All your defenitions are now gone", message.threadID);
 	} else {
-		delete pdefines[message.threadID];
+		delete pdefines.data[message.threadID];
 		api.sendMessage("All your global defenitions are now gone", message.threadID);
 	}
 }
@@ -345,61 +328,17 @@ function sendMessage(api, user, message) {
     return "not sendt"
 }
 
-function dropbox_get() {
-	console.log("Geting dropbox data");
-	// paused_threads:
-	dropbox_get_file(pause_file, (err, obj) => {
-		if (err && err.status != 409) return;
-		if (!err) {
-			Object.keys(pause).forEach((key) => { obj[key] = pause[key]; });
-			pause = obj;
-		}
-		pause_dont_oweride = false;
-	});
-
-	// defines_threads:
-	dropbox_get_file(defines_file, (err, obj) => {
-		if (err && err.status != 409) return;
-		if (!err) {
-			Object.keys(defines).forEach((key) => { obj[key] = defines[key]; });
-			defines = obj;
-		}
-		defines_dont_oweride = false;
-	});
-
-	// defines_threads:
-	dropbox_get_file(pdefines_file, (err, obj) => {
-		if (err && err.status != 409) return;
-		if (!err) {
-			Object.keys(pdefines).forEach((key) => { obj[key] = pdefines[key]; });
-			pdefines = obj;
-		}
-		pdefines_dont_oweride = false;
-	});
+function dropbox_pull() {
+	pause.db_pull();
+	defines.db_pull();
+	pdefines.db_pull();
 }
 
 function dropbox_upload() {
 	console.log("Uploading to dropbox!");
-	console.log(pause_dont_oweride);
-	console.log(defines_dont_oweride);
-	console.log(pdefines_dont_oweride);
-	// paused:
-	if (!pause_dont_oweride)
-		dfs.writeFile(pause_file, JSON.stringify(pause), (err, stat) => {
-			if (err) console.log(err);
-		});
-
-	// defines:
-	if (!defines_dont_oweride)
-		dfs.writeFile(defines_file, JSON.stringify(defines), (err, stat) => {
-			if (err) console.log(err);
-		});
-
-	// pdefines:
-	if (!pdefines_dont_oweride)
-		dfs.writeFile(pdefines_file, JSON.stringify(pdefines), (err, stat) => {
-			if (err) console.log(err);
-		});
+	pause.db_push();
+	defines.db_push();
+	pdefines.db_push();
 }
 
 function dropbox_get_file(file, callback) {
@@ -422,7 +361,6 @@ var k = process.env.PAUSE;
 if (!k || k.toLowerCase() != 'true') {
 	main();
 }
-
 
 // fblatexbot@yandex.com
 // Cos_micNøt33
