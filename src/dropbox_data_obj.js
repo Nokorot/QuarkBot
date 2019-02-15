@@ -3,11 +3,28 @@ const dfs = require('dropbox-fs')({
     apiKey: process.env.DROPBOX_API_KEY
 });
 
-module.exports = class dropboxDataObj {
-	constructor(db_file, debug=false) {
+class dropboxDataObj {
+	static db_pull_all() {
+		console.log("Downloading from dropbox!");
+		Object.keys(dropboxDataObj.insts).forEach((key) => {
+				dropboxDataObj.insts[key].db_pull();
+		})
+	}
+
+	static db_push_all() {
+		console.log("Uploading to dropbox!");
+		Object.keys(dropboxDataObj.insts).forEach((key) => {
+				dropboxDataObj.insts[key].db_push();
+		})
+	}
+
+	constructor(name, db_file, debug=false) {
 		this.db_file = debug ? "/debug/" + db_file :  "/" + db_file;
 		this.dont_overide = true;
 		this._data = {};
+
+		console.log("Constructing dbDataObj \"" + name + "\"");
+		dropboxDataObj.insts[name] = this;
 	}
 
 	get data() {
@@ -34,3 +51,7 @@ module.exports = class dropboxDataObj {
 			});
 	}
 };
+
+dropboxDataObj.insts = {};
+
+module.exports = dropboxDataObj

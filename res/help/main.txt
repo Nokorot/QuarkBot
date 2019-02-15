@@ -1,9 +1,9 @@
 Command list:
- \\help to show this message
- \\pause: temporarily pause the bot.
- \\unpause: to enable the bot if paused.
- \\define: define shortcuts.
- \\undefine to delete a shortcut.
- \\getdefines to list the defined shortcuts.
+ \help to show this message
+ \pause: temporarily pause the bot.
+ \unpause: to enable the bot if paused.
+ \define: define shortcuts.
+ \undefine to delete a shortcut.
+ \getdefines to list the defined shortcuts.
 
- Use \"\\help \\<command>\" for more info.
+ Use "\help \<command>" for more info.
