@@ -1,0 +1,2 @@
+LD_LIBRARY_PATH="/app/gnuplot/lib"
+export LD_LIBRARY_PATH
