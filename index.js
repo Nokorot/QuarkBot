@@ -6,8 +6,8 @@ const fs = require("fs");
 
 const dbDataObj = require('./src/dropbox_data_obj')
 const defines = require('./src/defines')
-const gnuplot = require('./src/gnuplot')
 const pause = require('./src/pause')
+const gnuplot = require('./src/gnuplot')
 const latex = require('./src/latex')
 const help = require('./src/help')
 
@@ -82,6 +82,7 @@ function onMassage(api, message) {
 		var code = message.body.split(' ');
 		var command = {
 			'\\plot': gnuplot.plot,
+			'\\splot': gnuplot.splot,
 			'\\getdefines': defines.getdefines,
 			'\\getlatexchars': latex.getlatexchars,
 			'\\define': defines.newDefine,

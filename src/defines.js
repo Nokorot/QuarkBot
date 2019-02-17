@@ -22,6 +22,8 @@ module.exports = {
 
 	// handle commands:
 	getdefines: function(api, message, code) {
+		if (pauseObj.data[message.threadID]) return;
+
 		if (message.isGroup) {
 			const defs = defines.data[message.threadID]
 			if (defs && Object.entries(defs).length > 0) {
@@ -40,6 +42,8 @@ module.exports = {
 	},
 
 	newDefine: function(api, message, code){
+		if (pauseObj.data[message.threadID]) return;
+
 		const define_value = code.slice(1).join(' ');
 		if (message.isGroup) {
 			if (!defines.data[message.threadID]) defines.data[message.threadID] = {};
@@ -53,6 +57,8 @@ module.exports = {
 	},
 
 	undefine: function(api, message, code){
+		if (pauseObj.data[message.threadID]) return;
+
 		if (message.isGroup) {
 			delete defines.data[message.threadID][code[0]];
 			api.sendMessage("\""+code[0]+"\" is undefined", message.threadID);
@@ -63,6 +69,8 @@ module.exports = {
 	},
 
 	undefineall: function(api, message, code){
+		if (pauseObj.data[message.threadID]) return;
+
 		if (message.isGroup) {
 			delete defines.data[message.threadID];
 			api.sendMessage("All your defenitions are now gone", message.threadID);
