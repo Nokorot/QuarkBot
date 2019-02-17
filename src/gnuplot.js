@@ -12,10 +12,8 @@ function gnuplot(api, message) {
 
 		plot.on('error', (err) => {
 			console.log(err.toString());
-			const e = err.toString().split('line 0: ')[1]);
-
-			api.sendMessage(e, message.threadID);
-		})
+			api.sendMessage("gnuplot-err: " + err.toString().split('line 0: ')[1], message.threadID);
+		});
 
     plot.print = function (data, options) {
         plot.write(data);
