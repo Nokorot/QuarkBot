@@ -6,6 +6,7 @@ const fs = require("fs");
 
 const dbDataObj = require('./src/dropbox_data_obj')
 const defines = require('./src/defines')
+const gnuplot = require('./src/gnuplot')
 const pause = require('./src/pause')
 const latex = require('./src/latex')
 const help = require('./src/help')
@@ -44,7 +45,7 @@ function main() {
 			}
 		});
 	});
-	setInterval(dbDataObj.db_push_all, DEBUG ? 10*1000 : 300*1000) // Every 5 minute
+	setInterval(dbDataObj.db_push_all, DEBUG ? 100*1000 : 300*1000) // Every 5 minute
 	setInterval(CeepAlive, 600*1000);  // Every 10 minutes
 }
 
@@ -80,6 +81,7 @@ function onMassage(api, message) {
 	} else if (msg.trim().startsWith('\\') ){
 		var code = message.body.split(' ');
 		var command = {
+			'\\plot': gnuplot.plot,
 			'\\getdefines': defines.getdefines,
 			'\\getlatexchars': latex.getlatexchars,
 			'\\define': defines.newDefine,

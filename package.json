@@ -14,6 +14,7 @@
     "express": "^4.16.4",
     "facebook-chat-api": "^1.6.1",
     "fs": "0.0.1-security",
+    "comandante": "0.0.1",
     "mathjax-node": "^2.1.1",
     "mathjax-node-svg2png": "^2.0.0",
     "pngjs": "^3.3.3"
