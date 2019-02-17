@@ -6,7 +6,8 @@ const fs = require("fs");
 var run = require('comandante');
 
 function gnuplot() {
-    var plot = run('gnuplot/gnuplot-qt', []);
+    var plot = run('gnuplot/bashrc', []);
+		var plot = run('gnuplot/gnuplot-qt', []);
 
     plot.print = function (data, options) {
         plot.write(data);
