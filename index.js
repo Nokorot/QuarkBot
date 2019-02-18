@@ -19,7 +19,6 @@ const DEBUG = process.env.DEBUG;
 var log = require("npmlog");
 log.pause();
 
-// TODO Sign-in based on environment key insted.
 function main() {
 	dbDataObj.db_pull_all();
 	web_interface()
