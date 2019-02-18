@@ -106,6 +106,10 @@ function onMassage(api, message) {
 		handleCommands(api, message, msg);
 	}
 
+	if (!pauseObj.data[message.threadID])
+		api.markAsRead(message.threadID, true);
+
+	
 	// TODO: handleNewChat()
 }
 
