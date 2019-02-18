@@ -8,9 +8,9 @@ npm-debug.log
 .DS_Store
 
 # files/folders
-out.png
+fblatexbot-appstate.json
+tmp/*
 test
-Test.txt
 
 # Docker
 Dockerfile

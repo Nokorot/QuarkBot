@@ -37,10 +37,10 @@ function latex_message(api, message, msgcode, msgbody){
   var code = defines.handleDefines( message, msg.substring(
                   msg.indexOf('\\latex')+'\\latex'.length, msg.length) );*/
   if (code && code.length > 1){
-    mathjax.tex2png(code, (path) => {
+    mathjax.tex2png(code, "tmp/latex.png", () => {
         api.sendMessage({
           body: body,
-          attachment: fs.createReadStream("out.png")
+          attachment: fs.createReadStream("tmp/latex.png")
         }, message.threadID);
     });
   } else {

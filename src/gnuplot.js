@@ -226,7 +226,7 @@ function plot(api, message, code, body) {
 
 	var plot_code = code.join(' ');
 
-	var writer = fs.createWriteStream('plot.png');
+	var writer = fs.createWriteStream('tmp/plot.png');
 	var gplot = gnuplot(api, message)
 				.set('term png size 400,300');
 
@@ -234,7 +234,7 @@ function plot(api, message, code, body) {
 
 	gplot.plot(plot_code, {end: true});
 	gplot.pipe(writer)
-			 .on('finish', () => sendPlot(api, message, 'plot.png'));
+			 .on('finish', () => sendPlot(api, message, 'tmp/plot.png'));
 }
 
 function splot(api, message, code) {
@@ -242,7 +242,7 @@ function splot(api, message, code) {
 
 	var plot_code = code.join(' ');
 
-	var writer = fs.createWriteStream('splot.png');
+	var writer = fs.createWriteStream('tmp/splot.png');
 	var gplot = gnuplot(api, message)
 				.set('term png size 400,300');
 
@@ -250,7 +250,7 @@ function splot(api, message, code) {
 
 	gplot.splot(plot_code, {end: true});
 	gplot.pipe(writer)
-			 .on('finish', () => sendPlot(api, message, 'splot.png'));
+			 .on('finish', () => sendPlot(api, message, 'tmp/splot.png'));
 }
 
 function implot(api, message, code) {
@@ -258,14 +258,14 @@ function implot(api, message, code) {
 
 	var plot_code = code.join(' ');
 
-	var writer = fs.createWriteStream('implot.png');
+	var writer = fs.createWriteStream('tmp/implot.png');
 	var gplot = gnuplot(api, message)
 				.set('term png size 400,300');
 
 	handleImpPlot(message.threadID, gplot, plot_code);
 
 	gplot.pipe(writer)
-			 .on('finish', () => sendPlot(api, message, 'implot.png'));
+			 .on('finish', () => sendPlot(api, message, 'tmp/implot.png'));
 }
 
 function handleCommands(api, message, code, body) {

@@ -7,8 +7,8 @@ function clamp(x, min, max){
     return x < min ? min : x > max ? max : x;
 }
 
-function addBackground(imgpath, callback) {
-    fs.createReadStream(imgpath)
+function addBackground(outfile, callback) {
+    fs.createReadStream(outfile)
         .pipe(new PNG({
             filterType: 4
         }))
@@ -52,7 +52,7 @@ function addBackground(imgpath, callback) {
             }
 
             this.pack()
-                .pipe(fs.createWriteStream(imgpath))
+                .pipe(fs.createWriteStream(outfile))
                 .on('finish', function () {
                     callback();
                 });
@@ -60,7 +60,7 @@ function addBackground(imgpath, callback) {
 }
 
 (function() {
-  module.exports.tex2png = function(yourMath, callback) {
+  module.exports.tex2png = function(yourMath, outfile, callback) {
     mjAPI.typeset({
       math: yourMath,
       format: "TeX", // or "inline-TeX", "MathML"
@@ -68,9 +68,9 @@ function addBackground(imgpath, callback) {
       scale:5
     }, function (data) {
         var base64Data = data.png.replace(/^data:image\/png;base64,/, "");
-        fs.writeFile("out.png", base64Data, 'base64', function(err) {
+        fs.writeFile(outfile, base64Data, 'base64', function(err) {
           if (err) {console.log(err);}
-          addBackground('out.png', callback);
+          addBackground(outfile, callback);
         });
     });
   }

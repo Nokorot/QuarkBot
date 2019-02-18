@@ -1,7 +1,8 @@
-const login = require("facebook-chat-api");
 const express = require('express')
 const path = require('path')
 const fs = require("fs");
+
+const login = require('./login.js')
 
 const dbDataObj = require('./src/dropbox_data_obj')
 const pause = require('./src/pause')
@@ -19,12 +20,11 @@ var log = require("npmlog");
 log.pause();
 
 // TODO Sign-in based on environment key insted.
-const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
 	dbDataObj.db_pull_all();
 	web_interface()
 
-	login({appState: JSON.parse(details)}, (err, api) => {
+	login((err, api) => {
 		setInterval(() => { handleMessageRequests(api) }, 10*1000); // Every 10 second
 
 		api.setOptions({listenEvents: true})
@@ -138,6 +138,3 @@ var k = process.env.PAUSE;
 if (!k || k.toLowerCase() != 'true') {
 	main();
 }
-
-// fblatexbot@yandex.com
-// Cos_micNøt33
