@@ -1,11 +1,15 @@
+/*
+* Based on node-gnuplot, https://github.com/davvo/node-gnuplot
+*/
 
 const fs = require("fs");
-//var gnuplot = require('gnuplot')
+const util = require("util");
+var run = require('comandante');
 
 const dbDataObj = require('./dropbox_data_obj')
 const pauseObj = dbDataObj.insts["Pause"];
 
-var run = require('comandante');
+let confObj = new dbDataObj("GnuplotConfig", "gnuplot-conf.json", process.env.DEBUG);
 
 function gnuplot(api, message) {
     var plot = run('gnuplot/bashrc', []);
@@ -27,6 +31,10 @@ function gnuplot(api, message) {
         return plot.print(data + '\n', options);
     };
 
+		/*plot.setf = function(data) {
+			plot.set(util.format(data, arguments.slice(1)));
+		}*/
+
     ['set', 'unset', 'plot', 'splot', 'replot'].forEach(function (name) {
         plot[name] = function (data, options) {
             if (data) {
@@ -39,35 +47,196 @@ function gnuplot(api, message) {
     return plot;
 };
 
+function handleLineSyle(code, threadID){
+	line_styles = [
+		('linewidth', 'lw'),
+		('linecolor', 'rgb'),
+		('dashtype', 'dt')
+	]
+
+	const data = confObj.data[message.threadID];
+	line_styles.forEach((name, key) => {
+		if (code.indexOf(key) >= 0);
+		else if (data['line_style'][name]) {
+			code += " " + key + " " + data['line_style'][name]
+		}
+	})
+}
+
+function handleGeneralPlotConfigs(threadID, gnuplot, code) {
+	const data = confObj.data[threadID];
+	if (!data) return;
+
+	if (data['ranges'])
+		Object.keys(data['ranges']).forEach((range) => {
+				gnuplot.set(range + " " + data['ranges'][range]);
+		});
+
+	if (data['title'])
+		gnuplot.set("title " + data['title']);
+
+	const ls = data['line_style'];
+	if (ls) {
+		var i;
+		for (i = 0; i < code.split(',').length; i++) {
+			if (ls['lw']) {
+				gnuplot.set(util.format("linetype %d lw %s", i+1, data['line_style']['lw']));
+			} else {
+				gnuplot.set(util.format("linetype %d lw %s", i+1, '3'));
+			}
+			if (ls['lc'] &&  ls['lc'].length > i) {
+				gnuplot.set(util.format("linetype %d lc rgb %s", i+1, data['line_style']['lc'][i]));
+			}
+			/*if (ls['dt'] &&  typeof(ls['dt']) == 'string') {
+				gnuplot.set(util.format("linetype %d dt %s", i+1, data['line_style']['rgb']));
+			} else */
+			if (ls['dt'] &&  ls['dt'].length > i) {
+				gnuplot.set(util.format("linetype %d dt %s", i+1, data['line_style']['dt'][i]));
+			}
+		}
+	}
+}
+
+function handleSPlotConfigs(threadID, gnuplot, code) {
+	handleGeneralPlotConfigs(threadID, gnuplot, code);
+}
+
+function handlePlotConfigs(threadID, gnuplot, code) {
+	handleGeneralPlotConfigs(threadID, gnuplot, code);
+}
 
 function sendPlot(api, message, file) {
 	api.sendMessage({
 		body: "",
-		attachment: fs.createReadStream("plot.png")
+		attachment: fs.createReadStream(file)
 	}, message.threadID);
 }
 
 module.exports = {
 	// handle commands:
+	unset: function(api, message, code) {
+		if (pauseObj.data[message.threadID]) return;
+		if(!confObj.data[message.threadID]) return;
+
+		const data = confObj.data[message.threadID];
+		if(!data['line_style'])
+			data['line_style'] = {};
+
+		switch (code[0]) {
+			case "linewidth": code[0] = 'lw'; break;
+			case "linecolour":
+			case "linecolor": code[0] = 'lc'; break;
+			case "dashtype":  code[0] = 'dt'; break;
+			default:
+		}
+
+		switch (code[0]) {
+			case "lw":
+			case "lc":
+			case "dt":
+				if(data['line_style'])
+					delete data['line_style'][code[0]];	break;
+
+			case "linestyle":
+				delete data['line_style'];
+
+			case "title":
+				delete data['title']; break;
+
+			case "xrange":
+			case "yrange":
+			case "zrange":
+				if(data['ranges'])
+					delete data['ranges'][code[0]]; break;
+
+			case "ranges":
+				delete data['ranges']; break;
+
+			case "all":
+				delete data; break;
+
+			default:
+		}
+	},
+
+	set: function(api, message, code) {
+		 	if (pauseObj.data[message.threadID]) return;
+
+			if(!confObj.data[message.threadID])
+				confObj.data[message.threadID] = {};
+			const data = confObj.data[message.threadID];
+
+			switch (code[0]) {
+				case "linewidth": code[0] = 'lw'; break;
+				case "linecolour":
+				case "linecolor": code[0] = 'lc'; break;
+				case "dashtype":  code[0] = 'dt'; break;
+				default:
+			}
+
+			switch (code[0]) {
+				case "lw":
+				case "lc":
+				case "dt":
+					if(!data['line_style'])
+						data['line_style'] = {};
+					data['line_style'][code[0]] = code[1].split(',');
+					break;
+
+				case "title":
+					var title = code.slice(1).join(" ");
+					if (title.match(/\'*\'/) || title.match(/\"*\"/))
+						data['title'] = title;
+					else data['title'] = "\""+title+"\"";
+					break;
+
+				case "xrange":
+				case "yrange":
+				case "zrange":
+					if(!data['ranges'])
+						data['ranges'] = {};
+					if (code[1].match(/\[*:*\]/))
+						data['ranges'][code[0]] = code[1];
+					else  data['ranges'][code[0]] = '\[' + code[1] + '\]';
+						break;
+
+				default:
+			}
+	},
+
 	plot: function(api, message, code) {
 		if (pauseObj.data[message.threadID]) return;
 
+		//var plot_code = handleLineSyle(code.join(' '), message.threadID);
+
+		var plot_code = code.join(' ');
+
 		var writer = fs.createWriteStream('plot.png');
 		var gplot = gnuplot(api, message)
-					.set('term png size 400,300')
-					.plot(code.join(' '), {end: true})
-					.pipe(writer)
-					.on('finish', () => sendPlot(api, message, 'plot.png'));
+					.set('term png size 400,300');
+
+		handlePlotConfigs(message.threadID, gplot, plot_code);
+
+		gplot.plot(plot_code, {end: true});
+		gplot.pipe(writer)
+				 .on('finish', () => sendPlot(api, message, 'plot.png'));
 	},
 
 	splot: function(api, message, code) {
 		if (pauseObj.data[message.threadID]) return;
 
-		var writer = fs.createWriteStream('plot.png size 400,300');
-		var gplot = gnuplot()
-					.set('term png')
-					.plot(code.join(' '), {end: true})
-					.pipe(writer)
-					.on('finish', () => sendPlot(api, message, 'plot.png'));
+		//var plot_code = handleLineSyle(code.join(' '), message.threadID);
+
+		var plot_code = code.join(' ');
+
+		var writer = fs.createWriteStream('splot.png');
+		var gplot = gnuplot(api, message)
+					.set('term png size 400,300');
+
+		handleSPlotConfigs(message.threadID, gplot, plot_code);
+
+		gplot.splot(plot_code, {end: true});
+		gplot.pipe(writer)
+				 .on('finish', () => sendPlot(api, message, 'splot.png'));
 	}
 }

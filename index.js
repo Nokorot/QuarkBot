@@ -3,7 +3,6 @@ const express = require('express')
 const path = require('path')
 const fs = require("fs");
 
-
 const dbDataObj = require('./src/dropbox_data_obj')
 const defines = require('./src/defines')
 const pause = require('./src/pause')
@@ -11,6 +10,7 @@ const gnuplot = require('./src/gnuplot')
 const latex = require('./src/latex')
 const help = require('./src/help')
 
+const pauseObj = dbDataObj.insts["Pause"];
 
 const PORT = process.env.PORT || 5000
 const DEBUG = process.env.DEBUG;
@@ -18,6 +18,7 @@ const DEBUG = process.env.DEBUG;
 var log = require("npmlog");
 log.pause();
 
+// TODO Sign-in based on environment key insted.
 const details = fs.readFileSync('fblatexbot-appstate.json', 'utf8');
 function main() {
 	dbDataObj.db_pull_all();
@@ -83,6 +84,8 @@ function onMassage(api, message) {
 		var command = {
 			'\\plot': gnuplot.plot,
 			'\\splot': gnuplot.splot,
+			'\\unset': gnuplot.unset,
+			'\\set': gnuplot.set,
 			'\\getdefines': defines.getdefines,
 			'\\getlatexchars': latex.getlatexchars,
 			'\\define': defines.newDefine,
@@ -93,6 +96,7 @@ function onMassage(api, message) {
 			'\\help': help
 		}[code[0].toLowerCase()];
 		if (command) command(api, message, code.slice(1));
+		else if (pauseObj.data[message.threadID]);
 		else api.sendMessage('Unknown command "' + code[0].toLowerCase() + '", try "\\help" for help', message.threadID);
 	}
 

@@ -13,5 +13,8 @@
 .git
 .gitignore
 
+# Local environment
+.env
+
 # Node.js dependencies:
 node_modules/
