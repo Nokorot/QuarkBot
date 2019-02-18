@@ -127,7 +127,6 @@ function sendPlot(api, message, file) {
 	}, message.threadID);
 }
 
-
 function unset(api, message, code) {
 	if (pauseObj.data[message.threadID]) return;
 	if(!confObj.data[message.threadID]) return;
@@ -267,19 +266,25 @@ function implot(api, message, code) {
 
 	gplot.pipe(writer)
 			 .on('finish', () => sendPlot(api, message, 'implot.png'));
-
 }
 
 function handleCommands(api, message, code, body) {
-	var cmd = {
+	var commands = {
 		'\\plot': plot,
 		'\\splot': splot,
 		'\\implot': implot,
 		'\\unset': unset,
 		'\\set': set
-	}[code[0]];
+	};
+	var cmd = commands[code[0].trim().toLowerCase()];
 	if (cmd) {
-		cmd(api, message, code.slice(1), body);
+		var i;
+		for (i = 1; i < code.length; i++)
+			if (commands[code[i].trim().toLowerCase()]) break;
+
+		cmd(api, message, code.slice(1,i), body);
+		if (i < code.length)
+			handleCommands(api, message, code.slice(i), []);
 		return true;
 	}
 	return false;

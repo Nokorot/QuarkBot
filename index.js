@@ -73,7 +73,7 @@ function handleMessageRequests(api) {
 }
 
 function handleCommands(api, message, code) {
-	var words = code.split(' ');
+	var words = code.split(/[ \n\t]+/);
 	var i;
 	for (i = 0; i < words.length; i++) {
 		if (latex.handleCommands(api, message, words.slice(i), words.slice(0,i))) return true;
