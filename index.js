@@ -4,8 +4,8 @@ const path = require('path')
 const fs = require("fs");
 
 const dbDataObj = require('./src/dropbox_data_obj')
-const defines = require('./src/defines')
 const pause = require('./src/pause')
+const defines = require('./src/defines')
 const gnuplot = require('./src/gnuplot')
 const latex = require('./src/latex')
 const help = require('./src/help')
@@ -72,20 +72,25 @@ function handleMessageRequests(api) {
 	});
 }
 
+function handleCommands(api, message, code) {
+	var words = code.split(' ');
+	var i;
+	for (i = 0; i < words.length; i++) {
+		if (latex.handleCommands(api, message, words.slice(i), words.slice(0,i))) return true;
+		if (gnuplot.handleCommands(api, message, words.slice(i), words.slice(0,i))) return true;
+	}
+	return false;
+}
+
 function onMassage(api, message) {
 	if (process.env.DEBUG && message.senderID != '100002011303211')
 		return;
 
+	// Startwith Commands:
 	var msg = message.body;
-	if (msg.includes('\\latex')) {
-		latex.message(api, message);
-	} else if (msg.trim().startsWith('\\') ){
+	if (msg.trim().startsWith('\\') ) {
 		var code = message.body.split(' ');
 		var command = {
-			'\\plot': gnuplot.plot,
-			'\\splot': gnuplot.splot,
-			'\\unset': gnuplot.unset,
-			'\\set': gnuplot.set,
 			'\\getdefines': defines.getdefines,
 			'\\getlatexchars': latex.getlatexchars,
 			'\\define': defines.newDefine,
@@ -95,9 +100,11 @@ function onMassage(api, message) {
 			'\\unpause': pause.unpause_thread,
 			'\\help': help
 		}[code[0].toLowerCase()];
-		if (command) command(api, message, code.slice(1));
-		else if (pauseObj.data[message.threadID]);
-		else api.sendMessage('Unknown command "' + code[0].toLowerCase() + '", try "\\help" for help', message.threadID);
+		if (command) command(api, message, code.slice(1))
+		else if (!pauseObj.data[message.threadID] && !handleCommands(api, message, msg))
+			api.sendMessage('Unknown command "' + code[0].toLowerCase() + '", try "\\help" for help', message.threadID);
+	} else {
+		handleCommands(api, message, msg);
 	}
 
 	// TODO: handleNewChat()

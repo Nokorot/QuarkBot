@@ -1,8 +1,18 @@
 
 const dbDataObj = require('./dropbox_data_obj')
 
+const pauseObj = dbDataObj.insts["Pause"];
+
 let defines = new dbDataObj("Defines", "threads/defines.json", process.env.DEBUG);
 let pdefines = new dbDataObj("PDefines", "pdefines.json", process.env.DEBUG);
+
+const illigal_syms = [
+	'\\plot', '\\splot', '\\implot', '\\unset', '\\set',
+	'\\getlatexchars', '\\latex',
+	'\\getdefines', '\\define', '\\undefine', '\\undefineall',
+	'\\pause', '\\unpause',
+	'\\help'
+]
 
 module.exports = {
 	handleDefines: function(message, msg) {
@@ -43,6 +53,9 @@ module.exports = {
 
 	newDefine: function(api, message, code){
 		if (pauseObj.data[message.threadID]) return;
+
+		if (illigal_syms.indexOf(code[0] >= 0))
+			return;
 
 		const define_value = code.slice(1).join(' ');
 		if (message.isGroup) {

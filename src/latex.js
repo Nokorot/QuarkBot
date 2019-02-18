@@ -23,13 +23,19 @@ function latex_unicode_compiler(code){
   return code;
 }
 
-function latex_message(api, message, code){
+function latex_message(api, message, msgcode, msgbody){
   if (pauseObj.data[message.threadID]) return;
-  const msg = message.body;
+	/*console.log(body);*/
+
+	var body = latex_unicode_compiler(defines.handleDefines(
+                      message, msgbody.join(' ') ));
+  var code = defines.handleDefines( message, msgcode.join(' ') );
+
+  /*const msg = message.body;
   var body = latex_unicode_compiler(defines.handleDefines(
                   message, msg.substring(0, msg.indexOf('\\latex')) ));
   var code = defines.handleDefines( message, msg.substring(
-                  msg.indexOf('\\latex')+'\\latex'.length, msg.length) );
+                  msg.indexOf('\\latex')+'\\latex'.length, msg.length) );*/
   if (code && code.length > 1){
     mathjax.tex2png(code, (path) => {
         api.sendMessage({
@@ -50,7 +56,20 @@ function getlatexchars(api, message, code) {
 	});
 }
 
+function handleCommands(api, message, code, body) {
+	var cmd = {
+		'\\latex': latex_message,
+	}[code[0]];
+	if (cmd) {
+		cmd(api, message, code.slice(1), body);
+		return true;
+	}
+	return false;
+}
+
 module.exports = {
+	handleCommands: handleCommands,
+
   message: latex_message,
 	getlatexchars: getlatexchars,
 	unicode_compiler: latex_unicode_compiler
