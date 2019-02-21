@@ -54,8 +54,10 @@ module.exports = {
 	newDefine: function(api, message, code){
 		if (pauseObj.data[message.threadID]) return;
 
-		if (illigal_syms.indexOf(code[0] >= 0))
-			return;
+		console.log(message);
+
+		/*if (illigal_syms.indexOf(code[0]) >= 0)
+			return;*/
 
 		const define_value = code.slice(1).join(' ');
 		if (message.isGroup) {
