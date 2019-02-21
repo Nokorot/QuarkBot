@@ -24,6 +24,8 @@ function main() {
 	web_interface()
 
 	login((err, api) => {
+		if (err) { console.error(err); return; }
+
 		setInterval(() => { handleMessageRequests(api) }, 10*1000); // Every 10 second
 
 		api.setOptions({listenEvents: true})
@@ -109,7 +111,7 @@ function onMassage(api, message) {
 	if (!pauseObj.data[message.threadID])
 		api.markAsRead(message.threadID, true);
 
-	
+
 	// TODO: handleNewChat()
 }
 
