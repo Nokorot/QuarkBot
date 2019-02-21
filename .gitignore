@@ -8,7 +8,7 @@ npm-debug.log
 .DS_Store
 
 # files/folders
-fblatexbot-appstate.json
+# fblatexbot-appstate.json
 tmp/*
 test
 

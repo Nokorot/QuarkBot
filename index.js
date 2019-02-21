@@ -54,7 +54,7 @@ function main() {
 function handleMessageRequests(api) {
 	api.getThreadList(100, null, ['PENDING'], (err, list) => {
 		if (err) {
-			console.error(err);
+			console.error(err.error);
 			return;
 		}
 		list.forEach((req)=>{
