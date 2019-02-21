@@ -53,6 +53,10 @@ function main() {
 
 function handleMessageRequests(api) {
 	api.getThreadList(100, null, ['PENDING'], (err, list) => {
+		if (err) {
+			console.error(err);
+			return;
+		}
 		list.forEach((req)=>{
 			console.log("Accseprint Message Requast: " + req.threadID);
 			api.handleMessageRequest(req.threadID, true);
