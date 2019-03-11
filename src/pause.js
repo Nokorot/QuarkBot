@@ -7,7 +7,7 @@ module.exports = {
   pause_thread: function (api, message, code) {
   	pause.data[message.threadID] = true;
   	console.log("Quark Bot is PAUSED!");
-  	api.sendMessage("Quark Bot is PAUSED!\nUse \"\\quark unpause\" to enable it aigain.", message.threadID);
+  	api.sendMessage("Quark Bot is PAUSED!\nUse \"\\unpause\" to enable it aigain.", message.threadID);
   },
 
   unpause_thread: function (api, message, code) {
