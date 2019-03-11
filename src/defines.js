@@ -54,8 +54,6 @@ module.exports = {
 	newDefine: function(api, message, code){
 		if (pauseObj.data[message.threadID]) return;
 
-		console.log(message);
-
 		/*if (illigal_syms.indexOf(code[0]) >= 0)
 			return;*/
 
