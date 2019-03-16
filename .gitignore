@@ -11,6 +11,7 @@ npm-debug.log
 # fblatexbot-appstate.json
 tmp/*
 test
+src/vendor
 
 # Docker
 Dockerfile

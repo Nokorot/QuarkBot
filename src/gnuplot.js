@@ -9,7 +9,7 @@ var run = require('comandante');
 const dbDataObj = require('./dropbox_data_obj')
 const pauseObj = dbDataObj.insts["Pause"];
 
-let confObj = new dbDataObj("GnuplotConfig", "gnuplot-conf.json", process.env.DEBUG);
+let plotConfObj = dbDataObj.insts["PlotConfig"];
 
 function gnuplot(api, message) {
     var plot = run('gnuplot/bashrc', []);
@@ -20,7 +20,7 @@ function gnuplot(api, message) {
 		});
 
     plot.print = function (data, options) {
-        plot.write(data);
+				plot.write(data);
         if (options && options.end) {
             plot.end();
         }
@@ -47,24 +47,20 @@ function gnuplot(api, message) {
     return plot;
 };
 
-function handleLineSyle(code, threadID){
-	line_styles = [
-		('linewidth', 'lw'),
-		('linecolor', 'rgb'),
-		('dashtype', 'dt')
-	]
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
+function formatCode(code) {
+	const rm = ['\\left', '\\right', '\\'];
 
-	const data = confObj.data[message.threadID];
-	line_styles.forEach((name, key) => {
-		if (code.indexOf(key) >= 0);
-		else if (data['line_style'][name]) {
-			code += " " + key + " " + data['line_style'][name]
-		}
-	})
+	code = code.replaceAll()
+	rm.forEach((key) => { code = code.replaceAll(key, " "); });
+	return code.replaceAll("^", "**");
 }
 
 function handleGeneralPlotConfigs(threadID, gnuplot, code) {
-	const data = confObj.data[threadID];
+	const data = plotConfObj.data[threadID];
 	if (!data) return;
 
 	if (data['ranges'])
@@ -73,25 +69,25 @@ function handleGeneralPlotConfigs(threadID, gnuplot, code) {
 		});
 
 	if (data['title'])
-		gnuplot.set("title " + data['title']);
+		gnuplot.set("title \'" + data['title'] + "\'");
 
 	const ls = data['line_style'];
 	if (ls) {
 		var i;
 		for (i = 0; i < code.split(',').length; i++) {
 			if (ls['lw']) {
-				gnuplot.set(util.format("linetype %d lw %s", i+1, data['line_style']['lw']));
+				gnuplot.set(util.format("linetype %d lw '%s'", i+1, data['line_style']['lw']));
 			} else {
-				gnuplot.set(util.format("linetype %d lw %s", i+1, '3'));
+				gnuplot.set(util.format("linetype %d lw '%s'", i+1, '3'));
 			}
 			if (ls['lc'] &&  ls['lc'].length > i) {
-				gnuplot.set(util.format("linetype %d lc rgb %s", i+1, data['line_style']['lc'][i]));
+				gnuplot.set(util.format("linetype %d lc rgb '%s'", i+1, data['line_style']['lc'][i]));
 			}
 			/*if (ls['dt'] &&  typeof(ls['dt']) == 'string') {
 				gnuplot.set(util.format("linetype %d dt %s", i+1, data['line_style']['rgb']));
 			} else */
 			if (ls['dt'] &&  ls['dt'].length > i) {
-				gnuplot.set(util.format("linetype %d dt %s", i+1, data['line_style']['dt'][i]));
+				gnuplot.set(util.format("linetype %d dt '%s'", i+1, data['line_style']['dt'][i]));
 			}
 		}
 	}
@@ -127,104 +123,12 @@ function sendPlot(api, message, file) {
 	}, message.threadID);
 }
 
-function unset(api, message, code) {
-	if (pauseObj.data[message.threadID]) return;
-	if(!confObj.data[message.threadID]) return;
-
-	const data = confObj.data[message.threadID];
-	if(!data['line_style'])
-		data['line_style'] = {};
-
-	switch (code[0]) {
-		case "linewidth": code[0] = 'lw'; break;
-		case "linecolour":
-		case "linecolor": code[0] = 'lc'; break;
-		case "dashtype":  code[0] = 'dt'; break;
-		default:
-	}
-
-	switch (code[0]) {
-		case "lw":
-		case "lc":
-		case "dt":
-			if(data['line_style'])
-				delete data['line_style'][code[0]];	break;
-
-		case "linestyle":
-			delete data['line_style']; break;
-
-		case "title":
-			delete data['title']; break;
-
-		case "xrange":
-		case "yrange":
-		case "zrange":
-			if(data['ranges'])
-				delete data['ranges'][code[0]]; break;
-
-		case "ranges":
-			delete data['ranges']; break;
-
-		case "all":
-			delete confObj.data[message.threadID]; break;
-
-		default:
-	}
-		console.log(confObj.data[message.threadID]);
-}
-
-function set(api, message, code) {
-		if (pauseObj.data[message.threadID]) return;
-
-		if(!confObj.data[message.threadID])
-			confObj.data[message.threadID] = {};
-		const data = confObj.data[message.threadID];
-
-		switch (code[0]) {
-			case "linewidth": code[0] = 'lw'; break;
-			case "linecolour":
-			case "linecolor": code[0] = 'lc'; break;
-			case "dashtype":  code[0] = 'dt'; break;
-			default:
-		}
-
-		switch (code[0]) {
-			case "lw":
-			case "lc":
-			case "dt":
-				if(!data['line_style'])
-					data['line_style'] = {};
-				data['line_style'][code[0]] = code[1].split(',');
-				break;
-
-			case "title":
-				var title = code.slice(1).join(" ");
-				if (title.match(/\'*\'/) || title.match(/\"*\"/))
-					data['title'] = title;
-				else data['title'] = "\""+title+"\"";
-				break;
-
-			case "xrange":
-			case "yrange":
-			case "zrange":
-				if(!data['ranges'])
-					data['ranges'] = {};
-				if (code[1].match(/\[*:*\]/))
-					data['ranges'][code[0]] = code[1];
-				else  data['ranges'][code[0]] = '\[' + code[1] + '\]';
-				break;
-
-			default:
-		}
-}
-
-function plot(api, message, code, body) {
+function plot(api, message, code) {
 	if (pauseObj.data[message.threadID]) return;
 
-	console.log(body);
-	//var plot_code = handleLineSyle(code.join(' '), message.threadID);
+	// console.log(body);
 
-	var plot_code = code.join(' ');
+	var plot_code = formatCode(code.join(' '));
 
 	var writer = fs.createWriteStream('tmp/plot.png');
 	var gplot = gnuplot(api, message)
@@ -240,7 +144,7 @@ function plot(api, message, code, body) {
 function splot(api, message, code) {
 	if (pauseObj.data[message.threadID]) return;
 
-	var plot_code = code.join(' ');
+	var plot_code = formatCode(code.join(' '));
 
 	var writer = fs.createWriteStream('tmp/splot.png');
 	var gplot = gnuplot(api, message)
@@ -256,7 +160,7 @@ function splot(api, message, code) {
 function implot(api, message, code) {
 	if (pauseObj.data[message.threadID]) return;
 
-	var plot_code = code.join(' ');
+	var plot_code = formatCode(code.join(' '));
 
 	var writer = fs.createWriteStream('tmp/implot.png');
 	var gplot = gnuplot(api, message)
@@ -268,28 +172,15 @@ function implot(api, message, code) {
 			 .on('finish', () => sendPlot(api, message, 'tmp/implot.png'));
 }
 
-function handleCommands(api, message, code, body) {
-	var commands = {
-		'\\plot': plot,
-		'\\splot': splot,
-		'\\implot': implot,
-		'\\unset': unset,
-		'\\set': set
-	};
-	var cmd = commands[code[0].trim().toLowerCase()];
-	if (cmd) {
-		var i;
-		for (i = 1; i < code.length; i++)
-			if (commands[code[i].trim().toLowerCase()]) break;
+function animate(api, message, code) {
+	if (pauseObj.data[message.threadID]) return;
 
-		cmd(api, message, code.slice(1,i), body);
-		if (i < code.length)
-			handleCommands(api, message, code.slice(i), []);
-		return true;
-	}
-	return false;
+	api.sendMessage("Sorry, the gnuplot doesn't suport animations yet, pleas use pyplot", message.threadID);
 }
 
 module.exports = {
-	handleCommands: handleCommands
+	plot: 		plot,
+	splot: 		splot,
+	implot: 	implot,
+	animate: animate
 }

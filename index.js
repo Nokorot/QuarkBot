@@ -1,3 +1,4 @@
+
 const express = require('express')
 const path = require('path')
 const fs = require("fs");
@@ -7,7 +8,7 @@ const login = require('./login.js')
 const dbDataObj = require('./src/dropbox_data_obj')
 const pause = require('./src/pause')
 const defines = require('./src/defines')
-const gnuplot = require('./src/gnuplot')
+const plot = require('./src/plot')
 const latex = require('./src/latex')
 const help = require('./src/help')
 
@@ -17,7 +18,7 @@ const PORT = process.env.PORT || 5000
 const DEBUG = process.env.DEBUG;
 
 var log = require("npmlog");
-log.pause();
+log.level = 'warn';
 
 function main() {
 	dbDataObj.db_pull_all();
@@ -82,7 +83,7 @@ function handleCommands(api, message, code) {
 	var i;
 	for (i = 0; i < words.length; i++) {
 		if (latex.handleCommands(api, message, words.slice(i), words.slice(0,i))) return true;
-		if (gnuplot.handleCommands(api, message, words.slice(i), words.slice(0,i))) return true;
+		if (plot.handleCommands(api, message, words.slice(i), words.slice(0,i))) return true;
 	}
 	return false;
 }
@@ -114,7 +115,6 @@ function onMassage(api, message) {
 
 	if (!pauseObj.data[message.threadID])
 		api.markAsRead(message.threadID, true);
-
 
 	// TODO: handleNewChat()
 }
