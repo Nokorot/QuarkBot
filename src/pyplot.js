@@ -52,11 +52,14 @@ function handleGeneralPlotConfigs(threadID, pyplot, code) {
 		pyplot.set("title " + data['title']);
 
 	const ls = data['line_style'];
-	line_style = {};
-	if (ls['lw']) line_style['linewidth'] = ls['lw'];
-	if (ls['lc']) line_style['linecolor'] = ls['lc'];
-	if (ls['dt']) line_style['dashtype']  = ls['dt'];
-	pyplot.set('linestyle ' + JSON.stringify(line_style))
+	if (ls) {
+		line_style = {};
+		if (ls['lw']) line_style['linewidth'] = ls['lw'];
+		if (ls['lc']) line_style['linecolor'] = ls['lc'];
+		if (ls['dt']) line_style['dashtype']  = ls['dt'];
+		pyplot.set('linestyle ' + JSON.stringify(line_style))
+	}
+
 }
 
 function sendPlot(api, message, file) {
