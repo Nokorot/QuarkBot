@@ -129,7 +129,8 @@ def implot(args):
 
     plt.savefig('tmp/implot.png');
 
-os.remove('output');
+if os.path.isfile('output'):
+    os.remove('output');
 def log(*data):
     with open('output', 'a') as f:
         f.write('\n'.join(map(str,data)) + '\n');
