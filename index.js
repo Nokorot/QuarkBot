@@ -17,6 +17,8 @@ const pauseObj = dbDataObj.insts["Pause"];
 const PORT = process.env.PORT || 5000
 const DEBUG = process.env.DEBUG;
 
+const URL = process.env.URL || "127.0.0.1:" + PORT;
+
 var log = require("npmlog");
 log.level = 'warn';
 
@@ -49,7 +51,7 @@ function main() {
 		});
 	});
 	setInterval(dbDataObj.db_push_all, DEBUG ? 100*1000 : 300*1000) // Every 5 minute
-	setInterval(CeepAlive, 600*1000);  // Every 10 minutes
+	setInterval(CeepAlive, DEBUG ? 100*1000 : 600*1000);  // Every 10 minutes
 }
 
 function handleMessageRequests(api) {
@@ -137,7 +139,7 @@ function web_interface(api) {
 
 const request = require('request');
 function CeepAlive() {
-	request('https://fb-latex-bot.herokuapp.com/', { json: true }, (err, res, body) => {
+	request(URL, { json: true }, (err, res, body) => {
 		if (err) { return console.log(err); }
 		console.log(body);
 	});
