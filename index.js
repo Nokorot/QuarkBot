@@ -17,10 +17,11 @@ const pauseObj = dbDataObj.insts["Pause"];
 const PORT = process.env.PORT || 5000
 const DEBUG = process.env.DEBUG;
 
-const URL = process.env.URL || "127.0.0.1:" + PORT;
+const URL = process.env.URL || "http://127.0.0.1:" + PORT;
 
-var log = require("npmlog");
-log.level = 'warn';
+require("npmlog").level = 'warn';
+
+const log = require('./src/log')();
 
 function main() {
 	dbDataObj.db_pull_all();
@@ -50,21 +51,23 @@ function main() {
 			}
 		});
 	});
-	setInterval(dbDataObj.db_push_all, DEBUG ? 100*1000 : 300*1000) // Every 5 minute
-	setInterval(CeepAlive, DEBUG ? 100*1000 : 600*1000);  // Every 10 minutes
+	setInterval(dbDataObj.db_push_all, DEBUG ? 100*1000 : 1200*1000) // Every 5 minute
+	setInterval(CeepAlive, DEBUG ? 100*1000 : 1200*1000);  // Every 10 minutes
 }
 
 function handleMessageRequests(api) {
 	api.getThreadList(100, null, ['PENDING'], (err, list) => {
 		if (err) {
 			console.error(err.error);
+			log("Error: HandleMessageRequests: " + err.error.toString(), 1);
 			return;
 		}
 		list.forEach((req)=>{
-			console.log("Accseprint Message Requast: " + req.threadID);
+			console.log("New Message Requast: " + req.threadID);
+			log("HandleMessageRequests: New Message Requast: " + req.threadID);
 			api.handleMessageRequest(req.threadID, true);
 			// move to handleNewChat:
-			api.sendMessage(req.threadID, approveMessage)
+			help.sendHelpMessage(api, req.threadID, "res/help/welcome.txt");
 			onMassage(api, {
 				type: 'message',
 				body: req.snippet,
@@ -106,7 +109,7 @@ function onMassage(api, message) {
 			'\\undefineall': defines.undefineall,
 			'\\pause': pause.pause_thread,
 			'\\unpause': pause.unpause_thread,
-			'\\help': help
+			'\\help': help.handleCommands
 		}[code[0].toLowerCase()];
 		if (command) command(api, message, code.slice(1))
 		else if (!pauseObj.data[message.threadID] && !handleCommands(api, message, msg))

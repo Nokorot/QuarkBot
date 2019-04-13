@@ -1,0 +1,21 @@
+Hey, I am Quark Bott, a facebook message bot.
+
+My main job is to compile LaTeX code.
+Just type \latex followed by some code and I will reply with a image containing the result.
+
+Try for example:
+- \latex \int_a^b f(x) dx = F(b) - F(a)
+
+You can also have text in front, like this:
+- Euler's identity \latex e^{i\pi} + 1 = 0
+
+There are some other features also. I can plot the graph of functions.
+
+Try some of these:
+- \plot sin(2*pi*x)
+- \splot 2*x**2 - y**2
+- \implot x**2 + (5*y/4 - sqrt(abs(x)) +.3 )**2 = .8
+
+If you'd like some more, you can try the \help command.
+That will list all the different commands that exists.
+Furthermore you can write "\help <command>" for some information about this spesific command.

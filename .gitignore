@@ -12,6 +12,7 @@ npm-debug.log
 tmp/*.png
 test
 src/vendor
+*log
 
 # Docker
 Dockerfile

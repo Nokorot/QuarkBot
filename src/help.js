@@ -6,19 +6,8 @@ String.prototype.regexIndexOf = function(regex, startpos) {
     return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
 }
 
-module.exports = function(api, message, code) {
-	file = "res/help/" + {
-					undefined: 'main',
-					'latex': "latex",
-					'getdefines': "getdefines",
-					'define': "define-undefine",
-					'undefine': "define-undefine",
-					'pause': "pause-unpause",
-					'unpause': "pause-unpause",
-					'getdefaultdefines': "getdefaultdefines",
-	}[code[0]] + ".txt";
-
-	fs.readFile(file, {encoding: 'utf8'}, (err, res) => {
+function sendHelpMessage(api, threadID, file) {
+  fs.readFile(file, {encoding: 'utf8'}, (err, res) => {
 		if (!err) {
 			res.split('::newmessage').forEach( (msg) => {
 				var attach = msg.regexIndexOf(new RegExp('::attachment\(.*\)'), 0);
@@ -30,10 +19,29 @@ module.exports = function(api, message, code) {
 						'attachment': fs.createReadStream( attach_file )
 					};
 				}
-				api.sendMessage(msg, message.threadID);
+				api.sendMessage(msg, threadID);
 			});
 		} else {
 			console.log(err);
 		}
 	});
+}
+
+module.exports = {
+  sendHelpMessage: sendHelpMessage,
+
+  handleCommands: function(api, message, code) {
+  	file = "res/help/" + {
+  					undefined: 'main',
+  					'latex': "latex",
+  					'getdefines': "getdefines",
+  					'define': "define-undefine",
+  					'undefine': "define-undefine",
+  					'pause': "pause-unpause",
+  					'unpause': "pause-unpause",
+  					'getdefaultdefines': "getdefaultdefines"
+  	}[code[0]] + ".txt";
+
+  	sendHelpMessage(api, message.threadID, file);
+  }
 }
