@@ -7,10 +7,6 @@ module.exports = function (  ) {
   var error  = fs.createWriteStream(dir + '/node.error.log', { flags: 'a' });
 
 
-  // redirect stdout / stderr
-  process.stdout.pipe(access);
-  process.stderr.pipe(error);
-
   return function(message, level=0) {
     if (level > 0)
       error.write(message + "\n");
