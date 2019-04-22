@@ -42,6 +42,9 @@ module.exports = {
   					'getdefaultdefines': "getdefaultdefines"
   	}[code[0]] + ".txt";
 
-  	sendHelpMessage(api, message.threadID, file);
+    if (!file)
+      api.sendMessage("Command Unknown: " + code[0]);
+    else
+      sendHelpMessage(api, message.threadID, file);
   }
 }
