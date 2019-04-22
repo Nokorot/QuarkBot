@@ -62,6 +62,10 @@ function handleGeneralPlotConfigs(threadID, pyplot, code) {
 
 }
 
+function overlodeExpr(expr){
+	return expr.replace(/\^/, '**');
+}
+
 function sendPlot(api, message, file) {
 	console.log(file, message.threadID);
 	api.sendMessage({
@@ -80,7 +84,7 @@ function plot(api, message, code, callback) {
 
 	handleGeneralPlotConfigs(message.threadID, pyplot, plot_code);
 
-	pyplot.plot(plot_code);
+	pyplot.plot(overlodeExpr(plot_code));
 	pyplot.exit((err_code) => {
 		if (err_code === 0)
 			sendPlot(api, message, 'tmp/plot.png');
@@ -97,7 +101,7 @@ function splot(api, message, code) {
 
 	handleGeneralPlotConfigs(message.threadID, pyplot, plot_code);
 
-	pyplot.splot(plot_code);
+	pyplot.splot(overlodeExpr(plot_code));
 	pyplot.exit((err_code) => {
 		if (err_code === 0)
 			sendPlot(api, message, 'tmp/splot.png');
@@ -114,7 +118,7 @@ function implot(api, message, code) {
 
 	handleGeneralPlotConfigs(message.threadID, pyplot, plot_code);
 
-	pyplot.implot(plot_code);
+	pyplot.implot(overlodeExpr(plot_code));
 	pyplot.exit((err_code) => {
 		if (err_code === 0)
 			sendPlot(api, message, 'tmp/implot.png');

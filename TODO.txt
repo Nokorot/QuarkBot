@@ -1,1 +1,13 @@
 
+## 
+
+- Add Replace ^ with **,
+- Add Logging to file
+
+- Fix new message requests
+- Fix Set Title for multiple words
+
+
+## Documentation 
+
+- Mension multiplot
