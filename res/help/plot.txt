@@ -1,0 +1,11 @@
+In case you wish to do something graphical, I can also graph/plot any function you might be interested in.
+Simply write \plot followed by the formula for your function. The function variable is assumed to be x.
+Using pyplot the following functions are defined;
+
+abs, acos, asin, atan, atan2, ceil, cos, cosh, degrees, exp, fabs, floor, fmod, frexp, hypot, ldexp, log, log10, modf, radians, sin, sinh, sqrt, tan, tanh
+
+The constants e and pi are also defined. Example:
+
+\plot cos(4*pi*x)*exp(-4*x**2)
+
+See also \help set.

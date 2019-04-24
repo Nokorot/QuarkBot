@@ -16,6 +16,6 @@ Try some of these:
 - \splot 2*x**2 - y**2
 - \implot x**2 + (5*y/4 - sqrt(abs(x)) +.3 )**2 = .8
 
-If you'd like some more, you can try the \help command.
-That will list all the different commands that exists.
-Furthermore you can write "\help <command>" for some information about this spesific command.
+Also try the help command:
+- \help
+to list the avable commands  that exists.
