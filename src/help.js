@@ -39,7 +39,7 @@ module.exports = {
   					'undefine': "define-undefine",
   					'pause': "pause-unpause",
   					'unpause': "pause-unpause",
-  					'getdefaultdefines': "getdefaultdefines"
+  					'getdefaultdefines': "getdefaultdefines",
 					'plot': "plot",
 					'splot': "splot",
 					'implot': "implot",
