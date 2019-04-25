@@ -1,0 +1,24 @@
+You can use the set command to specify the plot parameters. Write \set <parameter> <value>.
+The suported parameters are xrange, yrange, zrange, linecolour, linewidth and dashtype.
+For the linecolour, linewidth and dashtype, you can also use lc, lw and dt respectivly
+Examples:
+
+Ranges:
+- \set xrange -2*pi:2*pi
+
+Linecolour:
+- \set linecolour 'red'
+- \set linecolor 'cyan'
+- \set lc #AA44AA
+
+Linewidth:
+- \set linewidth 2
+- \set lw 3
+
+Dashtype:
+- \set dashtype --
+- \set dt :
+
+OPS: There is no error message before you try ploting something. So if you write something that does not work, you will NOT get an error, however \plot will not work. (This is somthing I will have to fix soon).
+
+If you want to find out more, the ploting is done using matplotlib in python. So you can find more info on matplotlib.org.

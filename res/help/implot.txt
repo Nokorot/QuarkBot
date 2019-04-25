@@ -2,6 +2,6 @@ This is my favorit ploting fiture, it allowes you to do an implisit plot, that i
 Just write \implot followed by the equation. The function variables are assumed to be x and y (Lower case).
 
 My favorit example:
-\implot x**2 + ( 5*y/4 - sqrt(abs(x)) +.2)**2 = .7
+- \implot x**2 + ( 5*y/4 - sqrt(abs(x)) +.2)**2 = .7
 
 See also \help plot and \help set.

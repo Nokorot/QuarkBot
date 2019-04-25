@@ -40,6 +40,11 @@ module.exports = {
   					'pause': "pause-unpause",
   					'unpause': "pause-unpause",
   					'getdefaultdefines': "getdefaultdefines"
+					'plot': "plot",
+					'splot': "splot",
+					'implot': "implot",
+					'set': "set",
+					'unset': "unset"
   	}[code[0]] + ".txt";
 
     if (!file)

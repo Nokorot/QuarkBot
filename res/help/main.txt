@@ -1,14 +1,27 @@
 Command list:
- \help:       Show this message
- \pause:      Pause the bot temporarily.
- \unpause:    Enable the bot if paused.
- \define:     Define shortcuts.
- \undefine:   Delete a shortcut.
- \getdefines: List the defined shortcuts.
- \plot:       Plot the graph of a function of x.
- \splot:      Plot the graph of a function of x and y.
- \implot:     Plot the solution set of an equation.
- \set:        Set the plot parameters.
- \unset:      Set plot parameters to default.
+ \help:       
+	Show this message
+ \pause:      
+	Pause the bot temporarily.
+ \unpause:    
+	Enable the bot if paused.
+ \define:     
+	Define shortcuts.
+ \undefine:   
+	Delete a shortcut.
+ \getdefines: 
+	List the defined shortcuts.
+ \plot:      
+	Plot the graph of a function of x.
+ \splot:      
+	Plot the graph of a function of x and y.
+ \implot:     
+	Plot the solution set of an equation.
+ \set:        
+	Set the plot parameters.
+ \unset:      
+	Set plot parameters to default.
 
- Use "\help <command>" for more info. (Example: \help plot)
+ Use
+ - \help <command>
+ for more info. (Example: \help plot)

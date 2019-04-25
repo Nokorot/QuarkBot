@@ -1,0 +1,8 @@
+You can use the set command to specify the plot parameters. Write \set <parameter> <value>. See \help set.
+
+- \unset <parameter>
+
+Set this parameter back to default.
+
+You can also write \unset all or \unset ranges, to reset all parameters or all ranges respectivly.
+

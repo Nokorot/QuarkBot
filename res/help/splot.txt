@@ -1,8 +1,8 @@
 In case you would like to plot the graph of a 2-variable function you, can use the \splot command, followed by the formula for your function.
 The function variables are assumed to be x and y or r and theta, where r²=x²+y², x=r*cos(theta) and y=r*sin(theta). Examples:
 
-\splot cos(4*pi*(x**2+y**2))*exp(-3*(x**2+y**2))
-\splot r**2*sin(8*theta)
-\splot x**2*sin(4*theta)
+- \splot cos(4*pi*(x**2+y**2))*exp(-3*(x**2+y**2))
+- \splot r**2*sin(8*theta)
+- \splot x**2*sin(4*theta)
 
 See also \help plot and \help set.

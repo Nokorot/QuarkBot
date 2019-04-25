@@ -6,6 +6,12 @@ abs, acos, asin, atan, atan2, ceil, cos, cosh, degrees, exp, fabs, floor, fmod, 
 
 The constants e and pi are also defined. Example:
 
-\plot cos(4*pi*x)*exp(-4*x**2)
+- \plot cos(4*pi*x)*exp(-4*x**2)
+
+In case you would like to plot the graph of multiple functions at ones, you can separate the functions with a comma. Example:
+
+- \set lc 'red','blue'
+  \set lw 3,3
+  \plot cos(2*pi*x), sin(2*pi*x)
 
 See also \help set.
