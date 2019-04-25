@@ -98,10 +98,12 @@ def splot(args):
     x = np.linspace(float(safe_eval(xr[0])),float(safe_eval(xr[1])),101);
     y = np.linspace(float(safe_eval(yr[0])),float(safe_eval(yr[1])),101);
     x, y = np.meshgrid(x,y)
+    r = np.sqrt(x**2 + y**2)
+    theta = np.arctan2(x,y);
 
     for (i, exp) in enumerate(exprs):
         ls = line_style[i] if i < len(line_style) else {};
-        ax.plot_surface(x, y, safe_eval(exp, {'x': x, 'y':y}), cmap='viridis');
+        ax.plot_surface(x, y, safe_eval(exp, {'x': x, 'y':y, 'r':r, 'theta':theta}), cmap='viridis');
 
     plt.savefig('tmp/splot.png');
 
