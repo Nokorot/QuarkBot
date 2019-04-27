@@ -1,5 +1,0 @@
-['set', 'output', 'png', 'size', '400,300', 'tmp/implot.png']
-['set', 'linestyle', '{"linewidth":["3"]}']
-['implot', 'x**2', '+', '(5*y/4', '-', 'sqrt(abs(x))', '+.3', ')**2', '=', '.8']
-{'linewidths': 3}
-['exit']

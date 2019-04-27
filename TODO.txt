@@ -1,13 +1,15 @@
 
-## 
+## Code changes
 
-- Add Replace ^ with **,
 - Add Logging to file
 
 - Fix new message requests
 - Fix Set Title for multiple words
 
+# done
+# - Add Replace ^ with **,
 
-## Documentation 
+## Documentation
 
 - Mension multiplot
+
