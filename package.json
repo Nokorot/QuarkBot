@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "dropbox-fs": "^0.3.1",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "facebook-chat-api": "^1.6.1",
     "fs": "0.0.1-security",
     "comandante": "0.0.1",
